@@ -1,6 +1,7 @@
-Plan van aanpak NCC
+**Plan van aanpak NCC**
+===================
 
-Idee
+**Idee**
 In project drone gaan we proberen een quadcopter aan te sturen die verschillende acties zou kunnen ondernemen. 
 Hier gaat het vooral om de functionaliteit van het geheel die zich indien mogelijk vertaalt in praktische toepassingen. 
 We hebben een quadcopter gekocht die voldoet aan onze eisen. Hier hebben we hard over na moeten denken maar we zijn uiteindelijk 
@@ -16,7 +17,8 @@ crazyflie wordt uitgerust met GPS en alle master en slaves allemaal onderling me
 is het plan om een uBLOX MAX-7 Pico Breakout with Chip Scale Antenna boven op de crazyflie te monteren.
 
 Taken per apparaat
-Master:
+===============
+**Master:**
 - Bij (dis)connect slave: maak nieuwe random graaf. 
 	- Via GUI kan je bestemming drone kiezen.
 	- Bepaalt wanneer shortest paths opnieuw berekend moeten worden (om de x seconden  
@@ -24,15 +26,15 @@ en bij (dis)connecten slave)
 - Heeft aparte thread of service die constant de gps-positie van de drone binnenkrijgt en 
 hiermee de richting van de drone bepaalt.
 
-Slave:
+**Slave:**
 - geeft GPS locatie als master hierom vraagt. 
 - berekent samen met andere slaves shortest path
 
-Drone:
+**Drone:**
 - verstuurt locatie naar master (push of pull)
 - krijgt vlieg-instructies van master
 
-Notes
+**Notes**
 Open source code voor vliegen naar gps locatie:
 https://github.com/diydrones/ardupilot?files=1
 
