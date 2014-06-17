@@ -150,6 +150,8 @@ public class MainActivity extends FragmentActivity implements
     LocationRequest mLocationRequest;
     LocationClient mLocationClient;
 
+    private Location mLocation;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -310,7 +312,8 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void updateFlightData(){
-        mFlightDataView.updateFlightData(getPitch(), getRoll(), getThrust(), getYaw());
+        mFlightDataView.updateFlightData(getPitch(), getRoll(), getThrust(), getYaw(),
+                mLocation.getLongitude(), mLocation.getLatitude());
     }
     
     @Override
@@ -758,11 +761,18 @@ public class MainActivity extends FragmentActivity implements
     // Define the callback method that receives location updates
     @Override
     public void onLocationChanged(Location location) {
+
+        mLocation = location;
+
         // Report to the UI that the location was updated
         String msg = "Updated Location: " +
                 Double.toString(location.getLatitude()) + "," +
                 Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+//        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        mFlightDataView.updateFlightData(getPitch(), getRoll(), getThrust(), getYaw(),
+                location.getLongitude(), location.getLatitude());
+
     }
 
     /*

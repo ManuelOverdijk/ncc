@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values-v11/styles.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values-v11/styles.xml -->
     <eat-comment />
 
     <style name="AppTheme" parent="android:Theme.Holo.Light" />

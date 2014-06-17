@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
 
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values/arrays.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values/arrays.xml -->
     <eat-comment />
 
     <string-array name="modeValues">
@@ -20,7 +20,7 @@
         <item>1</item>
         <item>2</item>
     </string-array>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/common_colors.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/common_colors.xml -->
     <eat-comment />
 
     <color name="common_action_bar_splitter">#d2d2d2</color>
@@ -33,7 +33,7 @@
     <color name="common_signin_btn_light_text_disabled">#FFAAAAAA</color>
     <color name="common_signin_btn_light_text_focused">#FF737373</color>
     <color name="common_signin_btn_light_text_pressed">@android:color/white</color>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_colors.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_colors.xml -->
     <eat-comment />
 
     <color name="wallet_bright_foreground_disabled_holo_light">#ffb2b2b2</color>
@@ -49,7 +49,7 @@
     <color name="wallet_hint_foreground_holo_light">#808080</color>
     <color name="wallet_holo_blue_light">#ff33b5e5</color>
     <color name="wallet_link_text_light">#0000ee</color>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/admob_ads_attrs.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/admob_ads_attrs.xml -->
     <eat-comment />
 
     <declare-styleable name="AdsAttrs">
@@ -71,7 +71,7 @@
         <!-- The ad unit ID. -->
         <attr name="adUnitId" format="string" />
     </declare-styleable>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/maps_attrs.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/maps_attrs.xml -->
     <eat-comment />
 
     <declare-styleable name="MapAttrs">
@@ -96,7 +96,7 @@
         <attr name="useViewLifecycle" format="boolean" />
         <attr name="zOrderOnTop" format="boolean" />
     </declare-styleable>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_attrs.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_attrs.xml -->
     <eat-comment />
 
     <declare-styleable name="WalletFragmentOptions">
@@ -170,20 +170,20 @@
             <enum name="monochrome" value="2" />
         </attr>
     </declare-styleable>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values/dimens.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values/dimens.xml -->
     <eat-comment />
 
     <dimen name="activity_horizontal_margin">5dp</dimen>
     <dimen name="activity_vertical_margin">5dp</dimen>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/version.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/version.xml -->
     <eat-comment />
 
     <integer name="google_play_services_version">4452000</integer>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values/strings.xml -->
     <eat-comment />
 
     <string name="app_name">CrazyflieControl</string>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/common_strings.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/common_strings.xml -->
     <eat-comment />
 
     <string name="common_google_play_services_enable_button" msgid="2523291102206661146">Enable Google Play services</string>
@@ -211,15 +211,17 @@
     <string name="common_google_play_services_update_title" msgid="1788179980625863495">Update Google Play services</string>
     <string name="common_signin_button_text">Sign in</string>
     <string name="common_signin_button_text_long">Sign in with Google</string>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values/strings.xml -->
     <eat-comment />
 
+    <string name="latitude">Lat: %1$s</string>
     <string name="linkQuality">Link: %1$s</string>
+    <string name="longitude">Lon: %1$s</string>
     <string name="menu_connect">Connect</string>
     <string name="menu_disconnect">Disconnect</string>
     <string name="menu_preferences">Preferences</string>
     <string name="menu_radio_scan">Radio Scan</string>
-    <string name="pitch">Pitch: %1$s</string>
+    <string name="pitch">P: %1$s</string>
     <string name="preferences_advancedflightcontrol">Advanced flight control</string>
     <string name="preferences_afc_bool_summary_off">Normal mode</string>
     <string name="preferences_afc_bool_summary_on">Crazy mode. Use at your own risk!</string>
@@ -285,23 +287,23 @@
     <string name="preferences_trim_defaultValue">0.0</string>
     <string name="preferences_xmode_summary">Client X-mode</string>
     <string name="preferences_xmode_title">X-Mode</string>
-    <string name="roll">Roll: %1$s</string>
+    <string name="roll">R: %1$s</string>
     <string name="select_connection_dialog_title">Select Connection</string>
-    <string name="thrust">Thrust: %1$s</string>
+    <string name="thrust">T: %1$s</string>
     <string name="title_activity_main">Crazyflie Control</string>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_strings.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_strings.xml -->
     <eat-comment />
 
     <string name="wallet_buy_button_place_holder" translation_description="Text on a button that allows a user to make a payment with Google Wallet [CHAR LIMIT=30]">Buy with Google</string>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values/strings.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values/strings.xml -->
     <eat-comment />
 
-    <string name="yaw">Yaw: %1$s</string>
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/values/styles.xml -->
+    <string name="yaw">Y: %1$s</string>
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/values/styles.xml -->
     <eat-comment />
 
     <style name="AppTheme" parent="android:Theme.Light" />
-    <!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_styles.xml -->
+    <!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/res/values/wallet_styles.xml -->
     <eat-comment />
 
     <style name="WalletFragmentDefaultButtonTextAppearance">

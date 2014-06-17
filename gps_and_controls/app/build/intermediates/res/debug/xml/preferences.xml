@@ -158,4 +158,4 @@
             android:title="@string/preferences_screen_rotation_lock_title" />
     </PreferenceCategory>
 
-</PreferenceScreen><!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/xml/preferences.xml -->
+</PreferenceScreen><!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/xml/preferences.xml -->

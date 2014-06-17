@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merger version="2" >
 
+    <dataSet config="4.4.52" >
+        <source path="/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/build/intermediates/exploded-aar/com.google.android.gms/play-services/4.4.52/assets" />
+    </dataSet>
     <dataSet config="main" >
-        <source path="/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/assets" />
+        <source path="/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/assets" />
     </dataSet>
     <dataSet config="debug" >
-        <source path="/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/debug/assets" />
+        <source path="/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/debug/assets" />
     </dataSet>
 
 </merger>

@@ -20,4 +20,4 @@
         android:showAsAction="never"
         android:title="@string/menu_preferences"/>
 
-</menu><!-- From: file:/home/koen/Downloads/crazyflie-android-client-0.1-alpha1/app/src/main/res/menu/activity_main.xml -->
+</menu><!-- From: file:/home/koen/inf13-14/netcentric/ncc_drone/ncc/gps_and_controls/app/src/main/res/menu/activity_main.xml -->

@@ -46,6 +46,8 @@ public class FlightDataView extends LinearLayout {
     private TextView mTextView_thrust;
     private TextView mTextView_yaw;
     private TextView mTextView_linkQuality;
+    private TextView mTextView_longitude;
+    private TextView mTextView_latitude;
 
     public FlightDataView(Context context, AttributeSet attrs) {
       super(context, attrs);
@@ -60,11 +62,16 @@ public class FlightDataView extends LinearLayout {
       mTextView_thrust = (TextView) findViewById(R.id.thrust);
       mTextView_yaw = (TextView) findViewById(R.id.yaw);
       mTextView_linkQuality = (TextView) findViewById(R.id.linkQuality);
+      mTextView_longitude = (TextView) findViewById(R.id.longitude);
+      mTextView_latitude = (TextView) findViewById(R.id.latitude);
+
       //initialize
       mTextView_pitch.setText(format(R.string.pitch, 0.0));
       mTextView_roll.setText(format(R.string.roll, 0.0));
       mTextView_thrust.setText(format(R.string.thrust, 0.0));
       mTextView_yaw.setText(format(R.string.yaw, 0.0));
+      mTextView_longitude.setText(format(R.string.longitude, 0.0));
+      mTextView_latitude.setText(format(R.string.latitude, 0.0));
       setLinkQualityText("n/a");
     }
 
@@ -72,11 +79,14 @@ public class FlightDataView extends LinearLayout {
       this(context, null);
     }
 
-    public void updateFlightData(float pitch, float roll, float thrust, float yaw) {
+    public void updateFlightData(float pitch, float roll, float thrust, float yaw, double longitude, double latitude) {
         mTextView_pitch.setText(format(R.string.pitch, round(pitch)));
         mTextView_roll.setText(format(R.string.roll, round(roll)));
         mTextView_thrust.setText(format(R.string.thrust, round(thrust)));
         mTextView_yaw.setText(format(R.string.yaw, round(yaw)));
+        mTextView_longitude.setText(format(R.string.longitude, longitude));
+        mTextView_latitude.setText(format(R.string.latitude, latitude));
+
     }
 
     private String format(int identifier, Object o){
