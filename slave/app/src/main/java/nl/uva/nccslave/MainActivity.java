@@ -111,6 +111,7 @@ public class MainActivity extends Activity implements
     public void onConnected(Bundle dataBundle) {
         // Display the connection status
         Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        mLocationClient.requestLocationUpdates(mLocationRequest, this);
     }
 
     @Override
