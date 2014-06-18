@@ -70,6 +70,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.MobileAnarchy.Android.Widgets.Joystick.DualJoystickView;
 import com.MobileAnarchy.Android.Widgets.Joystick.JoystickMovedListener;
@@ -125,6 +126,8 @@ public class MainActivity extends FragmentActivity implements
     private int mSoundConnect;
     private int mSoundDisconnect;
 
+    private ToggleButton mFollowToggle;
+
     // Global constants
     /*
      * Define a request code to send to Google Play services
@@ -150,7 +153,7 @@ public class MainActivity extends FragmentActivity implements
     LocationRequest mLocationRequest;
     LocationClient mLocationClient;
 
-    private Location mLocation;
+    private Location mLocation = null;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -166,6 +169,9 @@ public class MainActivity extends FragmentActivity implements
         mJoysticks.setMovementRange(mResolution, mResolution);
 
         mFlightDataView = (FlightDataView) findViewById(R.id.flightdataview);
+
+        mFollowToggle = (ToggleButton) findViewById(R.id.followToggle);
+        mFollowToggle.setEnabled(false);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(this.getPackageName()+".USB_PERMISSION");
@@ -452,6 +458,7 @@ public class MainActivity extends FragmentActivity implements
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            mFollowToggle.setEnabled(true);
                             Toast.makeText(getApplicationContext(), "Connected", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -462,6 +469,7 @@ public class MainActivity extends FragmentActivity implements
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            mFollowToggle.setEnabled(false);
                             Toast.makeText(getApplicationContext(), "Connection lost", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -473,6 +481,7 @@ public class MainActivity extends FragmentActivity implements
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
+                            mFollowToggle.setEnabled(false);
                             Toast.makeText(getApplicationContext(), "Connection failed", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -761,6 +770,15 @@ public class MainActivity extends FragmentActivity implements
     // Define the callback method that receives location updates
     @Override
     public void onLocationChanged(Location location) {
+
+        if (mFollowToggle.isChecked() &&
+                mLocation != null &&
+                mCrazyradioLink.isConnected()) {
+            // Calculate distance in meters between
+            // new location and previous location.
+            float distance = mLocation.distanceTo(location);
+            Log.d("ABC", "DISTANCE IN METERS: " + String.valueOf(distance));
+        }
 
         mLocation = location;
 
