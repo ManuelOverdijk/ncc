@@ -78,7 +78,7 @@
     <string name="thrust">Thrust: %1$s</string>
     <string name="yaw">Yaw: %1$s</string>
     <string name="linkQuality">Link: %1$s</string>
-    <string name="title_activity_slaves">SlavesActivity</string>
+    <string name="title_activity_slaves">Slaves</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
 
