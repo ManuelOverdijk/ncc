@@ -39,8 +39,6 @@ public class MainActivity extends Activity {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-
-        mReceiver.discoverPeers();
     }
 
     @Override
@@ -67,7 +65,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 showLocation();
-                new WiFiDirectBroadcastReceiver.LocationServerAsyncTask().execute();
+                mReceiver.discoverPeers();
             }
         });
 
@@ -76,6 +74,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 gpsLocationProvider.startMeasurements();
+                new WiFiDirectBroadcastReceiver.LocationServerAsyncTask().execute();
             }
         });
 
@@ -84,6 +83,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 gpsLocationProvider.stopMeasurements();
+                mManager.removeGroup(mChannel, null);
             }
         });
 

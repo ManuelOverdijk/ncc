@@ -1,12 +1,9 @@
 package com.example.projectdroneserver.app;
 
-import android.bluetooth.BluetoothClass;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
-import android.net.Uri;
 import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -22,6 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -31,27 +29,27 @@ import java.util.ArrayList;
  * A BroadcastReceiver that notifies of important Wi-Fi p2p events.
  */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
-    private Context context;
-
     private WifiP2pManager mManager;
     private Channel mChannel;
-    private MainActivity mActivity;
 
     private PeerListListener mPeerListListener;
     private WifiP2pManager.ConnectionInfoListener mConnectionInfoListener;
 
     private ArrayList<WifiP2pDevice> availablePeers;
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel,
-                                       MainActivity activity, Context context) {
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel) {
         super();
         this.mManager = manager;
         this.mChannel = channel;
-        this.mActivity = activity;
-        this.context = context;
 
         availablePeers = new ArrayList<WifiP2pDevice>();
 
+        setupPeerListener();
+        setupConnectionInfoListener();
+    }
+
+    // Gives access to available peers
+    void setupPeerListener() {
         mPeerListListener = new PeerListListener() {
             @Override
             public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
@@ -63,7 +61,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     config.deviceAddress = device.deviceAddress;
                     // TODO: 0 kleinste kans op GO, 15 grootste kans, -1 Doe maar wat
                     config.groupOwnerIntent = 15;
-                    config.wps.setup = WpsInfo.PBC;
 
                     mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
 
@@ -83,7 +80,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 discoverPeers();
             }
         };
+    }
 
+    // Returns group info
+    void setupConnectionInfoListener() {
         mConnectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(final WifiP2pInfo info) {
@@ -105,6 +105,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         };
     }
 
+    // Broadcast receiver
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
@@ -142,11 +143,11 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    // Wait for incoming gps information. call once, it has a loop
     public static class LocationServerAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override
         protected Void doInBackground(Void... params) {
             ServerSocket serverSocket;
-            Log.d("abc", "abc");
 
             try {
                 serverSocket = new ServerSocket(8888);
@@ -174,6 +175,66 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         }
     }
 
+    // Push gps information to master. call everytime gps location has changed.
+    // groupOwnerAddress should be set first.
+    public static class LocationClientAsyncTask extends AsyncTask<Void, Void, Void> {
+        private static InetAddress groupOwnerAddress;
+
+        public static void setGroupOwnerAddress(InetAddress address) {
+            groupOwnerAddress = address;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            if (groupOwnerAddress == null) {
+                Log.d("abc", "groupOwnerAddress not set");
+                return null;
+            }
+
+            Socket socket = new Socket();
+
+            try {
+                /**
+                 * Create a client socket with the host,
+                 * port, and timeout information.
+                 */
+                socket.bind(null);
+                Log.d("abc", "before connect. Groupowneraddress: " + groupOwnerAddress);
+                socket.connect(new InetSocketAddress(groupOwnerAddress, 8888), 500);
+                Log.d("abc", "after connect");
+
+                /**
+                 * Create a byte stream from a JPEG file and pipe it to the output stream
+                 * of the socket. This data will be retrieved by the server device.
+                 */
+                OutputStream outputStream = socket.getOutputStream();
+                outputStream.write(69);
+                outputStream.close();
+            } catch (FileNotFoundException e) {
+                //catch logic
+            } catch (IOException e) {
+                //catch logic
+            }
+
+            /**
+             * Clean up any open sockets when done
+             * transferring or if an exception occurred.
+             */ finally {
+                if (socket != null) {
+                    if (socket.isConnected()) {
+                        try {
+                            socket.close();
+                        } catch (IOException e) {
+                            //catch logic
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+    }
+
+    // Start peer discovery
     void discoverPeers() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
