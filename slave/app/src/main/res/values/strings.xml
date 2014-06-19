@@ -4,5 +4,8 @@
     <string name="app_name">NCC Slave</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="my_location">Current GPS Location</string>
+    <string name="latitude">Lat:</string>
+    <string name="longitude">Lon:</string>
 
 </resources>

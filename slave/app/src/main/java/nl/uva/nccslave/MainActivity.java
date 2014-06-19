@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -36,6 +37,9 @@ public class MainActivity extends Activity implements
     private final static int
             CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
+    private TextView mTvLatitude;
+    private TextView mTvLongitude;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -48,6 +52,9 @@ public class MainActivity extends Activity implements
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
 
         mLocationClient = new LocationClient(this, this, this);
+
+        mTvLatitude = (TextView) findViewById(R.id.tvLatitude);
+        mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
     }
 
     @Override
@@ -154,9 +161,12 @@ public class MainActivity extends Activity implements
     @Override
     public void onLocationChanged(Location location) {
         // Report to the UI that the location was updated
-        String msg = "Updated Location: " +
-                Double.toString(location.getLatitude()) + "," +
-                Double.toString(location.getLongitude());
-        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+//        String msg = "Updated Location: " +
+//                Double.toString(location.getLatitude()) + "," +
+//                Double.toString(location.getLongitude());
+//        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+
+        mTvLatitude.setText(Double.toString(location.getLatitude()));
+        mTvLongitude.setText(Double.toString(location.getLongitude()));
     }
 }
