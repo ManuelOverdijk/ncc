@@ -23,11 +23,19 @@ public class Slave {
         this.mLocation = location;
     }
 
+    public void setIdentifier(String identifier) {
+        this.mIdentifier = identifier;
+    }
+
     public String getIdentifier() {
         return this.mIdentifier;
     }
 
     public Location getLocation() {
         return this.mLocation;
+    }
+
+    public void setLocation(Location location) {
+        this.mLocation = location;
     }
 }

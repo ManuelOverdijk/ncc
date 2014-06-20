@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "se.bitcraze.crazyfliecontrol"
-        minSdkVersion 13
+        minSdkVersion 14
         targetSdkVersion 15
     }
 
