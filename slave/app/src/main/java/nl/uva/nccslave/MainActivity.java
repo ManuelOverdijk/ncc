@@ -1,13 +1,18 @@
 package nl.uva.nccslave;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.location.Location;
+import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +45,14 @@ public class MainActivity extends Activity implements
     private TextView mTvLatitude;
     private TextView mTvLongitude;
 
+    WifiP2pManager mManager;
+    WifiP2pManager.Channel mChannel;
+    WiFiDirectBroadcastReceiver mReceiver;
+    IntentFilter mIntentFilter;
+
+    Button btnDiscover;
+    Button btnDisconnect;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -55,6 +68,33 @@ public class MainActivity extends Activity implements
 
         mTvLatitude = (TextView) findViewById(R.id.tvLatitude);
         mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
+
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+
+        btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
+        btnDiscover = (Button) findViewById(R.id.btnDiscover);
+
+        btnDisconnect.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mReceiver.disconnect();
+            }
+        });
+
+        btnDiscover.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mReceiver.discoverPeers();
+            }
+        });
     }
 
     @Override
@@ -168,5 +208,8 @@ public class MainActivity extends Activity implements
 
         mTvLatitude.setText(Double.toString(location.getLatitude()));
         mTvLongitude.setText(Double.toString(location.getLongitude()));
+
+
+        new WiFiDirectBroadcastReceiver.LocationClientAsyncTask().execute(location);
     }
 }
