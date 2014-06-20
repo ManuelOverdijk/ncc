@@ -7,5 +7,7 @@
     <string name="my_location">Current GPS Location</string>
     <string name="latitude">Lat:</string>
     <string name="longitude">Lon:</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="discover">Discover</string>
 
 </resources>
