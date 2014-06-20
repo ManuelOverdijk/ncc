@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mManager.removeGroup(mChannel, null);
+        mReceiver.disconnect();
     }
 
     void setupButtons() {
@@ -84,7 +84,7 @@ public class MainActivity extends Activity {
             @Override
             public void onClick(View view) {
                 gpsLocationProvider.stopMeasurements();
-                mManager.removeGroup(mChannel, null);
+                mReceiver.disconnect();
             }
         });
 

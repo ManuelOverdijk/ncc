@@ -8,6 +8,7 @@ import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
+import android.net.wifi.p2p.WifiP2pGroup;
 import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
@@ -56,28 +57,29 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 availablePeers.clear();
                 availablePeers.addAll(wifiP2pDeviceList.getDeviceList());
 
+                Log.d("abc", "number of found peers: " + availablePeers.size());
+
                 for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
                     WifiP2pConfig config = new WifiP2pConfig();
                     config.deviceAddress = device.deviceAddress;
                     // TODO: 0 kleinste kans op GO, 15 grootste kans, -1 Doe maar wat
                     config.groupOwnerIntent = 15;
-
                     mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
 
                         @Override
                         public void onSuccess() {
                             //success logic
                             Log.d("", "Connection established");
+                            //TODO: misschien loopt ie omdat device nu uit available peers verdwijnt?
                         }
 
                         @Override
                         public void onFailure(int reason) {
                             //failure logic
-                            Log.d("", "Connection failed");
+                            Log.d("", "Connection failed. reason: " + reason);
                         }
                     });
                 }
-                discoverPeers();
             }
         };
     }
@@ -100,6 +102,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                     // you'll want to create a client thread that connects to the group
                     // owner.
                     Log.d("", "Group formed, group client");
+                    LocationClientAsyncTask.setGroupOwnerAddress(info.groupOwnerAddress);
                 }
             }
         };
@@ -109,6 +112,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
+        Log.d("abc", "received broadcast: " + action);
 
         if (WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION.equals(action)) {
             // Check to see if Wi-Fi is enabled and notify appropriate activity
@@ -116,14 +120,16 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             if (state == WifiP2pManager.WIFI_P2P_STATE_ENABLED) {
                 // Wifi P2P is enabled
 
-                if (mManager != null) {
-                    mManager.requestPeers(mChannel, mPeerListListener);
-                }
+//                if (mManager != null) {
+//                    mManager.requestPeers(mChannel, mPeerListListener);
+//                }
             } else {
                 // Wi-Fi P2P is not enabled
             }
         } else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             // Call WifiP2pManager.requestPeers() to get a list of current availablePeers
+//            int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
+//            Log.d("abc", "p2p peers changed action. discovery state: " + state);
         } else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             // Respond to new connection or disconnections
             NetworkInfo networkInfo = (NetworkInfo) intent
@@ -135,7 +141,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                 // We are connected with the other device, request connection
                 // info to find group owner IP
-
+                Log.d("abc", "requesting conncetion info");
                 mManager.requestConnectionInfo(mChannel, mConnectionInfoListener);
             }
         } else if (WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION.equals(action)) {
@@ -158,7 +164,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
             while(true) {
                 try {
+                    Log.d("abc", "before accpet");
                     Socket client = serverSocket.accept();
+                    Log.d("abc", "after accept");
 
                     InputStream inputstream = client.getInputStream();
 
@@ -240,12 +248,40 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             @Override
             public void onSuccess() {
                 Log.d("", "Discover availablePeers success");
+                if (mManager != null) {
+                    mManager.requestPeers(mChannel, mPeerListListener);
+                }
             }
 
             @Override
             public void onFailure(int reasonCode) {
-                Log.d("", "Discover availablePeers failure");
+                Log.d("", "Discover availablePeers failure. reason: " + reasonCode);
             }
         });
+    }
+
+    public void disconnect() {
+        if (mManager != null && mChannel != null) {
+            mManager.requestGroupInfo(mChannel, new WifiP2pManager.GroupInfoListener() {
+                @Override
+                public void onGroupInfoAvailable(WifiP2pGroup group) {
+                    if (group != null && mManager != null && mChannel != null
+                            && group.isGroupOwner()) {
+                        mManager.removeGroup(mChannel, new WifiP2pManager.ActionListener() {
+
+                            @Override
+                            public void onSuccess() {
+                                Log.d("abc", "removeGroup onSuccess -");
+                            }
+
+                            @Override
+                            public void onFailure(int reason) {
+                                Log.d("abc", "removeGroup onFailure -" + reason);
+                            }
+                        });
+                    }
+                }
+            });
+        }
     }
 }
