@@ -78,6 +78,8 @@ public class MainActivity extends Activity implements
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
+        registerReceiver(mReceiver, mIntentFilter);
 
         btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
         btnDiscover = (Button) findViewById(R.id.btnDiscover);
@@ -101,6 +103,20 @@ public class MainActivity extends Activity implements
     protected void onStart() {
         super.onStart();
         mLocationClient.connect();
+    }
+
+    /* register the broadcast receiver with the intent values to be matched */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver, mIntentFilter);
+    }
+
+    /* unregister the broadcast receiver */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
     }
 
     /*
@@ -209,7 +225,7 @@ public class MainActivity extends Activity implements
         mTvLatitude.setText(Double.toString(location.getLatitude()));
         mTvLongitude.setText(Double.toString(location.getLongitude()));
 
-
+        // Send location to server
         new WiFiDirectBroadcastReceiver.LocationClientAsyncTask().execute(location);
     }
 }
