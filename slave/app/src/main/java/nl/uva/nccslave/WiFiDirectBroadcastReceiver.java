@@ -32,6 +32,7 @@ import java.util.ArrayList;
  * A BroadcastReceiver that notifies of important Wi-Fi p2p events.
  */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
+    private MainActivity mMainActivity;
     private WifiP2pManager mManager;
     private Channel mChannel;
 
@@ -40,10 +41,11 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     private ArrayList<WifiP2pDevice> mAvailablePeers;
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel) {
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity mainActivity) {
         super();
         this.mManager = manager;
         this.mChannel = channel;
+        this.mMainActivity = mainActivity;
 
         // Initialize variables
         mAvailablePeers = new ArrayList<WifiP2pDevice>();
@@ -88,6 +90,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         public void onFailure(int reason) {
                             //failure logic
                             Log.d("", "Connection failed. reason: " + reason);
+                            if (reason == WifiP2pManager.BUSY) {
+                                mMainActivity.initWiFiDirectBroadcastReceiver();
+                            }
                         }
                     });
                 }
@@ -100,7 +105,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         mConnectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
             @Override
             public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-
                 // After the group negotiation, we can determine the group owner.
                 if (info.groupFormed && info.isGroupOwner) {
                     // Do whatever tasks are specific to the group owner.
@@ -131,6 +135,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             @Override
             public void onFailure(int reasonCode) {
                 Log.d("", "Discover availablePeers failure. reason: " + reasonCode);
+                mMainActivity.initWiFiDirectBroadcastReceiver();
             }
         });
     }

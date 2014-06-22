@@ -69,17 +69,7 @@ public class MainActivity extends Activity implements
         mTvLatitude = (TextView) findViewById(R.id.tvLatitude);
         mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
 
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
-
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
-        registerReceiver(mReceiver, mIntentFilter);
+        initWiFiDirectBroadcastReceiver();
 
         btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
         btnDiscover = (Button) findViewById(R.id.btnDiscover);
@@ -97,6 +87,29 @@ public class MainActivity extends Activity implements
                 mReceiver.discoverPeers();
             }
         });
+    }
+
+    void initWiFiDirectBroadcastReceiver() {
+        // Properly clean up old receiver
+        if (mReceiver != null) {
+            mReceiver.disconnect();
+            unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+
+        // Init new receiver
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+
+        // Register for broadcasts
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
+        registerReceiver(mReceiver, mIntentFilter);
     }
 
     @Override
