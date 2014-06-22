@@ -1,13 +1,13 @@
 apply plugin: 'android'
 
 android {
-    compileSdkVersion 14
+    compileSdkVersion 19
     buildToolsVersion "19.1.0"
 
     defaultConfig {
         applicationId "se.bitcraze.crazyfliecontrol"
         minSdkVersion 14
-        targetSdkVersion 15
+        targetSdkVersion 19
     }
 
     buildTypes {

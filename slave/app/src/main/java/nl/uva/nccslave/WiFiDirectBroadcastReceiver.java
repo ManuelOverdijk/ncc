@@ -167,7 +167,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d("", "received broadcast: " + action);
 
-        //TODO: Handle WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED?
         if (WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION.equals(action)) {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED) {
