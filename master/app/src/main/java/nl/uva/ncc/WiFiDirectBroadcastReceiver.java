@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
-import android.net.wifi.WpsInfo;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -13,15 +12,12 @@ import android.net.wifi.p2p.WifiP2pInfo;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.Channel;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
+import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.os.AsyncTask;
 import android.util.Log;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -32,10 +28,10 @@ import java.util.ArrayList;
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager mManager;
     private Channel mChannel;
-    private WiFiDirectConnectionListener mListener;
 
     private PeerListListener mPeerListListener;
-    private WifiP2pManager.ConnectionInfoListener mConnectionInfoListener;
+    private ConnectionInfoListener mConnectionInfoListener;
+    private WiFiDirectConnectionListener mListener;
 
     private ArrayList<WifiP2pDevice> mAvailablePeers;
 
@@ -44,17 +40,79 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         this.mManager = manager;
         this.mChannel = channel;
 
+        // Initialize variables
         mAvailablePeers = new ArrayList<WifiP2pDevice>();
 
+        // Setup Listeners
         setupPeerListener();
         setupConnectionInfoListener();
     }
 
-    /*
-     * Setters
+    /**
+     * setters
+     * @param listener
      */
     public void setOnConnectionChangedListener(WiFiDirectConnectionListener listener) {
         this.mListener = listener;
+    }
+
+    // Listener that gives access to available peers to connect to.
+    void setupPeerListener() {
+        mPeerListListener = new PeerListListener() {
+            @Override
+            public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+                mAvailablePeers.clear();
+                mAvailablePeers.addAll(wifiP2pDeviceList.getDeviceList());
+
+                Log.d("", "Peers available called. Found peers: " + mAvailablePeers.size());
+
+                // Connect to each device that is available.
+                for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
+                    // config is needed to connect. groupOwnerIntent tells the inclination
+                    // to be the group owner. 0 means least inclination.
+                    WifiP2pConfig config = new WifiP2pConfig();
+                    config.deviceAddress = device.deviceAddress;
+                    config.groupOwnerIntent = 15;
+
+                    mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                        @Override
+                        public void onSuccess() {
+                            // Successfully connected to this device.
+                            Log.d("", "Connection established");
+                            if (mListener != null) {
+                                mListener.onDeviceConnected(device);
+                            }
+                        }
+
+                        @Override
+                        public void onFailure(int reason) {
+                            // Failed to connect to this device.
+                            Log.d("", "Connection failed. reason: " + reason);
+                        }
+                    });
+                }
+            }
+        };
+    }
+
+    // Listener that provides connection information
+    void setupConnectionInfoListener() {
+        mConnectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
+            @Override
+            public void onConnectionInfoAvailable(final WifiP2pInfo info) {
+
+                if (!info.groupFormed || !info.isGroupOwner) {
+                    return;
+                }
+
+                // We are the owner of the group of devices, aka
+                // the master. Create a server thread and accept
+                // incoming connections.
+                Log.d("", "Group formed, group owner.");
+
+                new LocationServerAsyncTask().execute();
+            }
+        };
     }
 
     /*
@@ -107,61 +165,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     }
 
     /*
-     * Setup
-     */
-    void setupPeerListener() {
-        mPeerListListener = new PeerListListener() {
-            @Override
-            public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
-                mAvailablePeers.clear();
-                mAvailablePeers.addAll(wifiP2pDeviceList.getDeviceList());
-
-                Log.d("", "Peers available called. Found peers: " + mAvailablePeers.size());
-
-                // Connect to each device that is available.
-                for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
-                    WifiP2pConfig config = new WifiP2pConfig();
-                    config.deviceAddress = device.deviceAddress;
-                    config.groupOwnerIntent = 15;
-
-                    mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-                        @Override
-                        public void onSuccess() {
-                            // Successfully connected to this device.
-                            Log.d("", "Connection established");
-                        }
-
-                        @Override
-                        public void onFailure(int reason) {
-                            // Failed to connect to this device.
-                            Log.d("", "Connection failed. reason: " + reason);
-                        }
-                    });
-                }
-            }
-        };
-    }
-
-    void setupConnectionInfoListener() {
-        mConnectionInfoListener = new WifiP2pManager.ConnectionInfoListener() {
-            @Override
-            public void onConnectionInfoAvailable(final WifiP2pInfo info) {
-
-                if (!info.groupFormed || !info.isGroupOwner) {
-                    return;
-                }
-
-                // We are the owner of the group of devices, aka
-                // the master. Create a server thread and accept
-                // incoming connections.
-                Log.d("", "Group formed, group owner.");
-
-                new LocationServerAsyncTask().execute();
-            }
-        };
-    }
-
-    /*
      * Broadcast receiver logic / overrides
      */
     @Override
@@ -170,6 +173,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         Log.d("", "received broadcast: " + action);
 
         if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+            // reset connected peers
+            if (mListener != null) {
+                mListener.onDevicesDisconnected();
+            }
             // The number of peers around us has changed. Request
             // a list of all peers. mPeerListListener will receive
             // this list on completion of all peers and will try
@@ -177,35 +184,27 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             Log.d("", "PEERS CHANGED action. Requesting list of peers.");
             mManager.requestPeers(mChannel, mPeerListListener);
         }
+
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             Log.d("", "P2P CONNECTION CHANGED action. Connected or disconnected to peer.");
 
             // Respond to new connection or disconnections
-            NetworkInfo networkInfo = (NetworkInfo) intent
-                    .getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
-            WifiP2pDevice device = (WifiP2pDevice) intent
-                    .getParcelableExtra(WifiP2pManager.EXTRA_WIFI_P2P_DEVICE);
+            NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
-            if (networkInfo.isConnected()) {
-                Log.d("", "Peer connected.");
-
+            if (networkInfo != null && networkInfo.isConnected()) {
                 // We are connected with the other device, request connection
                 // info to find group owner IP.
                 Log.d("", "requesting connection info");
                 mManager.requestConnectionInfo(mChannel,
                         mConnectionInfoListener);
-
-                if (this.mListener != null) {
-                    this.mListener.onDeviceConnected(device);
-                }
             }
-            else  {
-                Log.d("", "Peer disconnected");
+        }
 
-                // Not connected
-                if (this.mListener != null) {
-                    this.mListener.onDeviceDisconnected(device);
-                }
+        // Re-initiate discovery
+        else if (WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION.equals(action)) {
+            int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
+            if (state == WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED) {
+                connect();
             }
         }
     }

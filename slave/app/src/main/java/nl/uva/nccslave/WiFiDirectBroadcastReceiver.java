@@ -38,7 +38,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private PeerListListener mPeerListListener;
     private ConnectionInfoListener mConnectionInfoListener;
 
-    private ArrayList<WifiP2pDevice> availablePeers;
+    private ArrayList<WifiP2pDevice> mAvailablePeers;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel) {
         super();
@@ -46,7 +46,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         this.mChannel = channel;
 
         // Initialize variables
-        availablePeers = new ArrayList<WifiP2pDevice>();
+        mAvailablePeers = new ArrayList<WifiP2pDevice>();
 
         // Setup Listeners
         setupPeerListener();
@@ -59,13 +59,13 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             @Override
             public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
                 // store list for later use
-                availablePeers.clear();
-                availablePeers.addAll(wifiP2pDeviceList.getDeviceList());
+                mAvailablePeers.clear();
+                mAvailablePeers.addAll(wifiP2pDeviceList.getDeviceList());
 
-                Log.d("", "number of found peers: " + availablePeers.size());
+                Log.d("", "number of found peers: " + mAvailablePeers.size());
 
                 // Make sure client is always listening when not in a group
-                if (availablePeers.size() == 0) {
+                if (mAvailablePeers.size() == 0) {
                     discoverPeers();
                 }
 
@@ -147,12 +147,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                             @Override
                             public void onSuccess() {
-                                Log.d("abc", "removeGroup onSuccess -");
+                                Log.d("", "removeGroup onSuccess -");
                             }
 
                             @Override
                             public void onFailure(int reason) {
-                                Log.d("abc", "removeGroup onFailure -" + reason);
+                                Log.d("", "removeGroup onFailure -" + reason);
                             }
                         });
                     }

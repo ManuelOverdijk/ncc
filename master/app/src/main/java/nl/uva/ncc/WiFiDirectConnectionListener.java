@@ -7,5 +7,5 @@ import android.net.wifi.p2p.WifiP2pDevice;
  */
 public interface WiFiDirectConnectionListener {
     public void onDeviceConnected(WifiP2pDevice device);
-    public void onDeviceDisconnected(WifiP2pDevice device);
+    public void onDevicesDisconnected();
 }

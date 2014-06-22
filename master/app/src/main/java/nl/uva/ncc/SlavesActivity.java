@@ -36,6 +36,10 @@ public class SlavesActivity extends Activity {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
+
+        // Fixes a bug the Android guide introduced
+        registerReceiver(mReceiver, mIntentFilter);
 
         mSlaves = new ArrayList<Slave>();
         mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
@@ -56,24 +60,26 @@ public class SlavesActivity extends Activity {
             }
 
             @Override
-            public void onDeviceDisconnected(WifiP2pDevice device) {
-                Slave slave = null;
+            public void onDevicesDisconnected() {
+                /* Old code: */
+//                Slave slave = null;
+//
+//                for (Slave aSlave : mSlaves) {
+//                    if (slave.getIdentifier().equals(device.deviceAddress)) {
+//                        slave = aSlave;
+//                    }
+//                }
+//
+//                if (slave != null) {
+//                    mSlaves.remove(slave);
+//                    mAdapter.notifyDataSetChanged();
+//                }
 
-                for (Slave aSlave : mSlaves) {
-                    if (slave.getIdentifier().equals(device.deviceAddress)) {
-                        slave = aSlave;
-                    }
-                }
+                mSlaves.clear();
 
-                if (slave != null) {
-                    mSlaves.remove(slave);
-                    mAdapter.notifyDataSetChanged();
-                }
             }
         });
 
-        // Fixes a bug the Android guide introduced
-        registerReceiver(mReceiver, mIntentFilter);
         mReceiver.connect();
     }
 
