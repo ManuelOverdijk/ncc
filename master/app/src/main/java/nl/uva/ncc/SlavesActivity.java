@@ -8,7 +8,9 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 
 import java.util.ArrayList;
@@ -18,6 +20,7 @@ import se.bitcraze.crazyfliecontrol.R;
 public class SlavesActivity extends Activity {
 
     ListView mListView;
+    Button mButton;
     ArrayAdapter mAdapter;
     ArrayList<Slave> mSlaves;
 
@@ -37,8 +40,16 @@ public class SlavesActivity extends Activity {
         mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setAdapter(mAdapter);
+        mButton = (Button)findViewById(R.id.button_connect);
 
-        mReceiver.connect();
+
+        mButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                //TODO: disconnect
+                mReceiver.connect();
+            }
+        });
     }
 
     void initWiFiDirectBroadcastReceiver() {
@@ -60,7 +71,6 @@ public class SlavesActivity extends Activity {
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
         registerReceiver(mReceiver, mIntentFilter);
 
         mReceiver.setOnConnectionChangedListener(new WiFiDirectConnectionListener() {
