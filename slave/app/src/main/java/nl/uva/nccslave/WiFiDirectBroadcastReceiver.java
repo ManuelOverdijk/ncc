@@ -115,7 +115,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     }
 
     // Start peer discovery
-    void discoverPeers() {
+    void connect() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -161,16 +161,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d("", "received broadcast: " + action);
 
-        if (WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION.equals(action)) {
-            int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
-            if (state == WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED) {
-                if (mManager != null) {
-                    discoverPeers();
-                }
-            }
-        }
-
-        else if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
+        if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
             if (mManager != null) {
                 mManager.requestPeers(mChannel, mPeerListListener);
             }
