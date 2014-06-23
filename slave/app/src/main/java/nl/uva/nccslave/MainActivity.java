@@ -6,11 +6,13 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.location.Location;
+import android.net.wifi.p2p.WifiP2pConfig;
+import android.net.wifi.p2p.WifiP2pDevice;
+import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -23,10 +25,13 @@ import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
+import java.util.Collection;
+
 public class MainActivity extends Activity implements
         GooglePlayServicesClient.ConnectionCallbacks,
         GooglePlayServicesClient.OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        PeerListListener {
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
     public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
@@ -56,6 +61,18 @@ public class MainActivity extends Activity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // WiFi Direct stuff
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        registerReceiver(mReceiver, mIntentFilter);
+
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(
                 LocationRequest.PRIORITY_HIGH_ACCURACY);
@@ -67,40 +84,14 @@ public class MainActivity extends Activity implements
         mTvLatitude = (TextView) findViewById(R.id.tvLatitude);
         mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
 
-        initWiFiDirectBroadcastReceiver();
-
         mButton = (Button) findViewById(R.id.button_discover);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //TODO: disconnect
-                mReceiver.disconnect();
-                mReceiver.connect();
+                mReceiver.startDiscovery();
             }
         });
-    }
-
-    void initWiFiDirectBroadcastReceiver() {
-        // Properly clean up old receiver
-        if (mReceiver != null) {
-            mReceiver.disconnect();
-            unregisterReceiver(mReceiver);
-            mReceiver = null;
-        }
-
-        // Init new receiver
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
-
-        // Register for broadcasts
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        registerReceiver(mReceiver, mIntentFilter);
     }
 
     @Override
@@ -231,5 +222,36 @@ public class MainActivity extends Activity implements
 
         // Send location to server
         new LocationClientAsyncTask().execute(location);
+    }
+
+    @Override
+    public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
+        Collection<WifiP2pDevice> deviceList = wifiP2pDeviceList.getDeviceList();
+        Log.d("", "Peers available called. Found peers: " + deviceList.size());
+
+        // Connect to each device that is available.
+        for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
+            // config is needed to connect. groupOwnerIntent tells the inclination
+            // to be the group owner. 0 means least inclination.
+
+            WifiP2pConfig config = new WifiP2pConfig();
+            config.deviceAddress = device.deviceAddress;
+            config.groupOwnerIntent = 15;
+
+            mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
+                @Override
+                public void onSuccess() {
+                    // Successfully connected to this device.
+                    // Request info about device
+                    Log.d("", "Successfully connected to device");
+                }
+
+                @Override
+                public void onFailure(int reason) {
+                    // Failed to connect to this device.
+                    Log.d("", "Connection failed. reason: " + reason);
+                }
+            });
+        }
     }
 }

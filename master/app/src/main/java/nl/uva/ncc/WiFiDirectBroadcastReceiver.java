@@ -141,7 +141,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // this list on completion of all peers and will try
             // to connect to each peer in the list.
             Log.d("", "PEERS CHANGED action. Requesting list of peers.");
-
             mManager.requestPeers(mChannel, mListener);
         }
 
