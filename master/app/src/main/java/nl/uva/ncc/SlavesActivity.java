@@ -107,12 +107,12 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
             }
 
             if (alreadyConnected) {
-                break;
+                continue;
             }
 
             WifiP2pConfig config = new WifiP2pConfig();
             config.deviceAddress = device.deviceAddress;
-            config.groupOwnerIntent = 15;
+            config.groupOwnerIntent = 15; // we want to be group owner since we are master
 
             mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
                 @Override

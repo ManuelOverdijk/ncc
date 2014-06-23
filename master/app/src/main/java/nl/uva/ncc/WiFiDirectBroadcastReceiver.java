@@ -153,6 +153,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             if (networkInfo != null && networkInfo.isConnected()) {
                 // We are connected with the other device, request connection
                 // info to find group owner IP.
+
                 Log.d("", "requesting connection info");
                 mManager.requestConnectionInfo(mChannel, new ConnectionInfoListener() {
                     @Override
@@ -160,7 +161,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         if (!info.groupFormed || !info.isGroupOwner) {
                             return;
                         }
-
 
                         // We are the owner of the group of devices, aka
                         // the master. Create a server thread and accept
