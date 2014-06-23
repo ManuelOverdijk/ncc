@@ -128,6 +128,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             @Override
             public void onFailure(int reasonCode) {
                 Log.d("", "Discover availablePeers failure. reason: " + reasonCode);
+//                mSlavesActivity.initWiFiDirectBroadcastReceiver();
             }
         });
     }
@@ -157,7 +158,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                     @Override
                     public void onFailure(int reason) {
-                        Log.d("abc", "removeGroup onFailure -" + reason);
+                        Log.d("", "removeGroup onFailure -" + reason);
                     }
                 });
             }

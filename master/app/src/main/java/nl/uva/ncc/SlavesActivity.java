@@ -31,25 +31,38 @@ public class SlavesActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_slaves);
 
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
-
-        // Fixes a bug the Android guide introduced
-        registerReceiver(mReceiver, mIntentFilter);
+        initWiFiDirectBroadcastReceiver();
 
         mSlaves = new ArrayList<Slave>();
         mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setAdapter(mAdapter);
 
+        mReceiver.connect();
+    }
+
+    void initWiFiDirectBroadcastReceiver() {
+        // Properly clean up old receiver
+        if (mReceiver != null) {
+            mReceiver.disconnect();
+            unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+
+        // Init new receiver
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
-
         mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
+
+        // Register for broadcasts
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
+        registerReceiver(mReceiver, mIntentFilter);
+
         mReceiver.setOnConnectionChangedListener(new WiFiDirectConnectionListener() {
             @Override
             public void onDeviceConnected(WifiP2pDevice device) {
@@ -79,8 +92,6 @@ public class SlavesActivity extends Activity {
 
             }
         });
-
-        mReceiver.connect();
     }
 
     /*

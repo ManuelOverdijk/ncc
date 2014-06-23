@@ -100,7 +100,7 @@ public class MainActivity extends Activity implements
         // Init new receiver
         mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
         mChannel = mManager.initialize(this, getMainLooper(), null);
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
 
         // Register for broadcasts
         mIntentFilter = new IntentFilter();

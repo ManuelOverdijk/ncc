@@ -32,7 +32,6 @@ import java.util.ArrayList;
  * A BroadcastReceiver that notifies of important Wi-Fi p2p events.
  */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
-    private MainActivity mMainActivity;
     private WifiP2pManager mManager;
     private Channel mChannel;
 
@@ -41,11 +40,10 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
     private ArrayList<WifiP2pDevice> mAvailablePeers;
 
-    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel, MainActivity mainActivity) {
+    public WiFiDirectBroadcastReceiver(WifiP2pManager manager, Channel channel) {
         super();
         this.mManager = manager;
         this.mChannel = channel;
-        this.mMainActivity = mainActivity;
 
         // Initialize variables
         mAvailablePeers = new ArrayList<WifiP2pDevice>();
@@ -66,11 +64,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
 
                 Log.d("", "number of found peers: " + mAvailablePeers.size());
 
-                // Make sure client is always listening when not in a group
-                if (mAvailablePeers.size() == 0) {
-                    discoverPeers();
-                }
-
                 // Try to connect to all available peers
                 for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
                     // config is needed to connect. groupOwnerIntent tells the inclination
@@ -90,9 +83,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         public void onFailure(int reason) {
                             //failure logic
                             Log.d("", "Connection failed. reason: " + reason);
-                            if (reason == WifiP2pManager.BUSY) {
-                                mMainActivity.initWiFiDirectBroadcastReceiver();
-                            }
                         }
                     });
                 }
@@ -135,7 +125,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             @Override
             public void onFailure(int reasonCode) {
                 Log.d("", "Discover availablePeers failure. reason: " + reasonCode);
-                mMainActivity.initWiFiDirectBroadcastReceiver();
             }
         });
     }
@@ -176,7 +165,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
             if (state == WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED) {
                 if (mManager != null) {
-                    mManager.requestPeers(mChannel, mPeerListListener);
+                    discoverPeers();
                 }
             }
         }
