@@ -29,9 +29,6 @@ import java.util.concurrent.Semaphore;
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager mManager;
     private Channel mChannel;
-
-    private ConnectionInfoListener mConnectionInfoListener;
-    private ArrayList<WifiP2pDevice> mAvailablePeers;
     private PeerListListener mListener;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager,
@@ -42,15 +39,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         this.mManager = manager;
         this.mChannel = channel;
         this.mListener = listener;
-
-        // Initialize variables
-        mAvailablePeers = new ArrayList<WifiP2pDevice>();
     }
 
     /*
      * Connect / disconnect
      */
-    public void connect() {
+    public void startDiscovery() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
             public void onSuccess() {
@@ -64,33 +58,53 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         });
     }
 
-    // Asynchronous disconnect
-    public void disconnectAsynchronous(final Runnable completion) {
-        if (mManager == null || mChannel == null) {
-            return;
-        }
-
-        mManager.cancelConnect(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                completion.run();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                completion.run();
-            }
-        });
-    }
-
-    // Synchronous disconnect
-    public void disconnectSynchronous() {
+    public void syncStopDiscovery() {
         if (mManager == null || mChannel == null) {
             return;
         }
 
         final Semaphore semaphore = new Semaphore(1, true);
-        semaphore.acquire();
+
+        try {
+            semaphore.acquire();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        mManager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
+            @Override
+            public void onSuccess() {
+                semaphore.release();
+            }
+
+            @Override
+            public void onFailure(int reason) {
+                semaphore.release();
+            }
+        });
+
+        try {
+            semaphore.acquire();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void syncDisconnect() {
+        if (mManager == null || mChannel == null) {
+            return;
+        }
+
+        final Semaphore semaphore = new Semaphore(1, true);
+
+        try {
+            semaphore.acquire();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         mManager.cancelConnect(mChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -104,7 +118,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             }
         });
 
-        semaphore.acquire();
+        try {
+            semaphore.acquire();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     /*
@@ -121,7 +140,12 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // this list on completion of all peers and will try
             // to connect to each peer in the list.
             Log.d("", "PEERS CHANGED action. Requesting list of peers.");
-            mManager.requestPeers(mChannel, mListener);
+
+            // Alleen requesten als discoveren
+            int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
+            if (state != WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED) {
+                mManager.requestPeers(mChannel, mListener);
+            }
         }
 
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {

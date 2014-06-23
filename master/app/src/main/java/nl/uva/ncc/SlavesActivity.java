@@ -60,7 +60,7 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mReceiver.connect();
+                mReceiver.startDiscovery();
             }
         });
     }
@@ -84,7 +84,8 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mReceiver.disconnectSynchronous();
+        mReceiver.syncStopDiscovery();
+        mReceiver.syncDisconnect();
     }
 
     @Override
