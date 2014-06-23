@@ -141,11 +141,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // to connect to each peer in the list.
             Log.d("", "PEERS CHANGED action. Requesting list of peers.");
 
-            // Alleen requesten als discoveren
-            int state = intent.getIntExtra(WifiP2pManager.EXTRA_DISCOVERY_STATE, -1);
-            if (state != WifiP2pManager.WIFI_P2P_DISCOVERY_STOPPED) {
-                mManager.requestPeers(mChannel, mListener);
-            }
+            mManager.requestPeers(mChannel, mListener);
         }
 
         else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
