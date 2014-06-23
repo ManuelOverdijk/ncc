@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.view.Window;
 
 import java.util.ArrayList;
 
@@ -32,11 +33,12 @@ public class SlavesActivity extends Activity {
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setAdapter(mAdapter);
 
-        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+        mListView.setOnItemClickListener(new ListView.OnItemClickListener(){
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Intent intent = new Intent(getApplicationContext(), SlavesSimulate.class);
-                intent.putExtra("id", id);
+                Intent intent = new Intent(parent.getContext(), SlavesSimulate.class);
+                startActivity(intent);
             }
         });
     }
