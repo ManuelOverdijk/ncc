@@ -12,96 +12,24 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import java.util.ArrayList;
-
 import se.bitcraze.crazyfliecontrol.R;
 
-public class SlavesActivity extends Activity {
+import uva.nc.ServiceActivity;
+import uva.nc.bluetooth.BluetoothService;
+
+public class SlavesActivity extends ServiceActivity {
 
     ListView mListView;
     ArrayAdapter mAdapter;
     ArrayList<Slave> mSlaves;
 
-    WifiP2pManager mManager;
-    WifiP2pManager.Channel mChannel;
-    WiFiDirectBroadcastReceiver mReceiver;
-    IntentFilter mIntentFilter;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+        super.onCreate=(savedInstanceState);
         setContentView(R.layout.activity_slaves);
-
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
-
-        // Fixes a bug the Android guide introduced
-        registerReceiver(mReceiver, mIntentFilter);
-
-        mSlaves = new ArrayList<Slave>();
-        mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
-        mListView = (ListView)findViewById(R.id.listView);
-        mListView.setAdapter(mAdapter);
-
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
-        mReceiver.setOnConnectionChangedListener(new WiFiDirectConnectionListener() {
-            @Override
-            public void onDeviceConnected(WifiP2pDevice device) {
-                Slave slave = new Slave();
-                slave.setIdentifier(device.deviceAddress);
-                mSlaves.add(slave);
-                mAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onDevicesDisconnected() {
-                /* Old code: */
-//                Slave slave = null;
-//
-//                for (Slave aSlave : mSlaves) {
-//                    if (slave.getIdentifier().equals(device.deviceAddress)) {
-//                        slave = aSlave;
-//                    }
-//                }
-//
-//                if (slave != null) {
-//                    mSlaves.remove(slave);
-//                    mAdapter.notifyDataSetChanged();
-//                }
-
-                mSlaves.clear();
-
-            }
-        });
-
-        mReceiver.connect();
     }
 
-    /*
-     * Overrides
-     */
+    @Override void onBluetoothReady(BluetoothService bluetooth) {
 
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver(mReceiver, mIntentFilter);
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(mReceiver);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mReceiver.disconnect();
     }
 }
