@@ -30,6 +30,7 @@ public class LocationClientAsyncTask extends AsyncTask<Location, Void, Void> imp
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ObjectOutputStream os = new ObjectOutputStream(out);
         os.writeObject(obj);
+        Log.d("", "size: " + out.size());
         return out.toByteArray();
     }
 
