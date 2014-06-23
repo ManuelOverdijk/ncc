@@ -55,7 +55,7 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
         mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setAdapter(mAdapter);
-        mButton = (Button)findViewById(R.id.button_connect);
+        mButton = (Button)findViewById(R.id.button_discover);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
