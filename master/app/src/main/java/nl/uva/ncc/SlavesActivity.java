@@ -93,13 +93,23 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
         Collection<WifiP2pDevice> deviceList = wifiP2pDeviceList.getDeviceList();
         Log.d("", "Peers available called. Found peers: " + deviceList.size());
 
-        // Remove all slaves
-        mSlaves.clear();
-
         // Connect to each device that is available.
         for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
             // config is needed to connect. groupOwnerIntent tells the inclination
             // to be the group owner. 0 means least inclination.
+            boolean alreadyConnected = false;
+
+            for (Slave slave : mSlaves) {
+                if (slave.getIdentifier().equals(device.deviceAddress)) {
+                    Log.d("", "Already connected to device.");
+                    alreadyConnected = true;
+                }
+            }
+
+            if (alreadyConnected) {
+                break;
+            }
+
             WifiP2pConfig config = new WifiP2pConfig();
             config.deviceAddress = device.deviceAddress;
             config.groupOwnerIntent = 15;
@@ -109,6 +119,8 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
                 public void onSuccess() {
                     // Successfully connected to this device.
                     // Request info about device
+                    Log.d("", "Successfully connected to device");
+
                     Slave slave = new Slave();
                     slave.setIdentifier(device.deviceAddress);
                     mSlaves.add(slave);

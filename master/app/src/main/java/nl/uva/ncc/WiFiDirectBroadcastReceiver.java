@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
@@ -160,6 +161,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                         if (!info.groupFormed || !info.isGroupOwner) {
                             return;
                         }
+
 
                         // We are the owner of the group of devices, aka
                         // the master. Create a server thread and accept
