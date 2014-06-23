@@ -42,7 +42,6 @@ public class SlavesActivity extends Activity {
         mListView.setAdapter(mAdapter);
         mButton = (Button)findViewById(R.id.button_discover);
 
-
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

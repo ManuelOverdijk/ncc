@@ -230,6 +230,6 @@ public class MainActivity extends Activity implements
         mTvLongitude.setText(Double.toString(location.getLongitude()));
 
         // Send location to server
-        new WiFiDirectBroadcastReceiver.LocationClientAsyncTask().execute(location);
+        new LocationClientAsyncTask().execute(location);
     }
 }
