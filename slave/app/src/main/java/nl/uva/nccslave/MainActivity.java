@@ -44,14 +44,12 @@ public class MainActivity extends Activity implements
 
     private TextView mTvLatitude;
     private TextView mTvLongitude;
+    Button mButton;
 
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
     WiFiDirectBroadcastReceiver mReceiver;
     IntentFilter mIntentFilter;
-
-    Button btnDiscover;
-    Button btnDisconnect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,20 +69,14 @@ public class MainActivity extends Activity implements
 
         initWiFiDirectBroadcastReceiver();
 
-        btnDisconnect = (Button) findViewById(R.id.btnDisconnect);
-        btnDiscover = (Button) findViewById(R.id.btnDiscover);
+        mButton = (Button) findViewById(R.id.button_discover);
 
-        btnDisconnect.setOnClickListener(new View.OnClickListener() {
+        mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                //TODO: disconnect
                 mReceiver.disconnect();
-            }
-        });
-
-        btnDiscover.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                mReceiver.discoverPeers();
+                mReceiver.connect();
             }
         });
     }
@@ -108,7 +100,6 @@ public class MainActivity extends Activity implements
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_DISCOVERY_CHANGED_ACTION);
         registerReceiver(mReceiver, mIntentFilter);
     }
 
@@ -239,6 +230,6 @@ public class MainActivity extends Activity implements
         mTvLongitude.setText(Double.toString(location.getLongitude()));
 
         // Send location to server
-        new WiFiDirectBroadcastReceiver.LocationClientAsyncTask().execute(location);
+        new LocationClientAsyncTask().execute(location);
     }
 }
