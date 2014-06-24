@@ -43,6 +43,8 @@ public class ServerTask extends AsyncTask<Void, Void, Void>{
             try {
                 Log.d("", "before accept");
                 Socket client = serverSocket.accept();
+                Log.d("", "" + client.getRemoteSocketAddress().toString());
+                Log.d("", client.getInetAddress().getHostAddress());
                 Log.d("", "after accept");
 
                 client.getInetAddress().getHostad
