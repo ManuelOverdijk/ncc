@@ -11,29 +11,21 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.util.Log;
 
-import java.util.concurrent.Semaphore;
-
 /**
  * A BroadcastReceiver that notifies of important Wi-Fi p2p events.
  */
 public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
     private WifiP2pManager mManager;
     private Channel mChannel;
-    private PeerListListener mListener;
 
     public WiFiDirectBroadcastReceiver(WifiP2pManager manager,
-                                       Channel channel,
-                                       PeerListListener listener) {
+                                       Channel channel) {
         super();
-
         this.mManager = manager;
         this.mChannel = channel;
-        this.mListener = listener;
     }
 
-    /*
-     * Connect / disconnect
-     */
+    // Start peer discovery
     public void startDiscovery() {
         mManager.discoverPeers(mChannel, new WifiP2pManager.ActionListener() {
             @Override
@@ -48,74 +40,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         });
     }
 
-    public void syncStopDiscovery() {
-        if (mManager == null || mChannel == null) {
-            return;
-        }
-
-        final Semaphore semaphore = new Semaphore(1, true);
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mManager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                semaphore.release();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                semaphore.release();
-            }
-        });
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void syncDisconnect() {
-        if (mManager == null || mChannel == null) {
-            return;
-        }
-
-        final Semaphore semaphore = new Semaphore(1, true);
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mManager.cancelConnect(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                semaphore.release();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                semaphore.release();
-            }
-        });
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /*
      * Broadcast receiver logic / overrides
      */
@@ -124,30 +48,21 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         String action = intent.getAction();
         Log.d("", "received broadcast: " + action);
 
-        if (WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION.equals(action)) {
-            // The number of peers around us has changed. Request
-            // a list of all peers. mPeerListListener will receive
-            // this list on completion of all peers and will try
-            // to connect to each peer in the list.
-            Log.d("", "PEERS CHANGED action. Requesting list of peers.");
-            mManager.requestPeers(mChannel, mListener);
-        }
-
-        else if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
-            Log.d("", "P2P CONNECTION CHANGED action. Connected or disconnected to peer.");
-
-            // Respond to new connection or disconnections
+        if (WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION.equals(action)) {
             NetworkInfo networkInfo = intent.getParcelableExtra(WifiP2pManager.EXTRA_NETWORK_INFO);
 
             if (networkInfo != null && networkInfo.isConnected()) {
                 // We are connected with the other device, request connection
                 // info to find group owner IP.
-                Log.d("", "requesting connection info");
+                Log.d("", "Requesting connection info");
                 mManager.requestConnectionInfo(mChannel, new ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
                         if (info.groupFormed && !info.isGroupOwner) {
                             ClientTask.setGroupOwnerAddress(info.groupOwnerAddress);
+                        } else if (info.groupFormed) {
+                            Log.e("", "Slave shouldn't be group owner. Closing application now");
+                            System.exit(0);
                         }
                     }
                 });

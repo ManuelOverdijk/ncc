@@ -1,9 +1,6 @@
 package nl.uva.nccslave;
 
-import android.location.Location;
 import android.os.AsyncTask;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.FileNotFoundException;
@@ -25,15 +22,6 @@ public class ClientTask extends AsyncTask<Slave, Void, Void> implements Serializ
 
     public static void setGroupOwnerAddress(InetAddress address) {
         groupOwnerAddress = address;
-    }
-
-    // Serializes an object (Location) into a byte array.
-    public static byte[] marshall(Parcelable parceable) {
-        Parcel parcel = Parcel.obtain();
-        parceable.writeToParcel(parcel, 0);
-        byte[] bytes = parcel.marshall();
-        parcel.recycle(); // not sure if needed or a good idea
-        return bytes;
     }
 
     @Override
@@ -63,13 +51,16 @@ public class ClientTask extends AsyncTask<Slave, Void, Void> implements Serializ
             Log.d("", "Connect call returned");
 
             OutputStream outputStream = socket.getOutputStream();
+
+            // Serialize slave object and write to output stream.
             ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
             objectOutputStream.writeObject(slave);
             objectOutputStream.close();
+
         } catch (FileNotFoundException e) {
-            Log.e("", e.toString());
+            e.printStackTrace();
         } catch (IOException e) {
-            Log.e("", e.toString());
+            e.printStackTrace();
         }
 
         /**
@@ -81,7 +72,7 @@ public class ClientTask extends AsyncTask<Slave, Void, Void> implements Serializ
                 try {
                     socket.close();
                 } catch (IOException e) {
-                    Log.e("", e.toString());
+                    e.printStackTrace();
                 }
             }
         }

@@ -8,15 +8,9 @@ import android.content.IntentSender;
 import android.location.Location;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.net.wifi.p2p.WifiP2pDevice;
-import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
-import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -25,73 +19,66 @@ import android.widget.Toast;
 
 import com.example.mymodule.app2.Slave;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesClient;
+import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
+import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.location.LocationClient;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 
-import java.util.Collection;
-
 public class MainActivity extends Activity implements
-        GooglePlayServicesClient.ConnectionCallbacks,
-        GooglePlayServicesClient.OnConnectionFailedListener,
-        LocationListener,
-        PeerListListener {
+        ConnectionCallbacks,
+        OnConnectionFailedListener,
+        LocationListener {
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
-    public static final int UPDATE_INTERVAL_IN_SECONDS = 5;
-    private static final long UPDATE_INTERVAL =
-            MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
+    private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
+    private static final long UPDATE_INTERVAL = MILLISECONDS_PER_SECOND * UPDATE_INTERVAL_IN_SECONDS;
     private static final int FASTEST_INTERVAL_IN_SECONDS = 1;
-    private static final long FASTEST_INTERVAL =
-            MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
+    private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
     LocationRequest mLocationRequest;
     LocationClient mLocationClient;
-
-    private final static int
-            CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
-
-    private TextView mTvLatitude;
-    private TextView mTvLongitude;
-    private Button mButton;
-    private EditText mNameInput;
 
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
     WiFiDirectBroadcastReceiver mReceiver;
     IntentFilter mIntentFilter;
 
+    // UI elements
+    private TextView mTvLatitude;
+    private TextView mTvLongitude;
+    private EditText mNameInput;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // WiFi Direct stuff
-        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
-        mChannel = mManager.initialize(this, getMainLooper(), null);
-        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
-
-        mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
-        registerReceiver(mReceiver, mIntentFilter);
-
+        // Setup location requests
         mLocationRequest = LocationRequest.create();
         mLocationRequest.setPriority(
                 LocationRequest.PRIORITY_HIGH_ACCURACY);
         mLocationRequest.setInterval(UPDATE_INTERVAL);
         mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
-
         mLocationClient = new LocationClient(this, this, this);
 
+        // setup wifi direct framework
+        mManager = (WifiP2pManager) getSystemService(Context.WIFI_P2P_SERVICE);
+        mChannel = mManager.initialize(this, getMainLooper(), null);
+        mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel);
+
+        // register broadcastreceiver
+        mIntentFilter = new IntentFilter();
+        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
+        registerReceiver(mReceiver, mIntentFilter);
+
+        // get ui elements
         mTvLatitude = (TextView) findViewById(R.id.tvLatitude);
         mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
-
-        mButton = (Button) findViewById(R.id.button_discover);
+        Button mButton = (Button) findViewById(R.id.button_discover);
         mNameInput = (EditText) findViewById(R.id.input_name);
 
         mButton.setOnClickListener(new View.OnClickListener() {
@@ -102,17 +89,11 @@ public class MainActivity extends Activity implements
         });
     }
 
+    /* start location requests */
     @Override
     protected void onStart() {
         super.onStart();
         mLocationClient.connect();
-    }
-
-    /* register the broadcast receiver with the intent values to be matched */
-    @Override
-    protected void onResume() {
-        super.onResume();
-        registerReceiver(mReceiver, mIntentFilter);
     }
 
     /* unregister the broadcast receiver */
@@ -122,13 +103,19 @@ public class MainActivity extends Activity implements
         unregisterReceiver(mReceiver);
     }
 
+    /* register the broadcast receiver with the intent values to be matched */
+    @Override
+    protected void onResume() {
+        super.onResume();
+        registerReceiver(mReceiver, mIntentFilter);
+    }
+
     /*
      * LOCATION
      */
-
+    //TODO: doet op het moment helemaal niks..
     @Override
-    protected void onActivityResult(
-            int requestCode, int resultCode, Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Decide what to do based on the original request code
         switch (requestCode) {
             case CONNECTION_FAILURE_RESOLUTION_REQUEST :
@@ -146,6 +133,7 @@ public class MainActivity extends Activity implements
         }
     }
 
+    //TODO: Wordt niet gebruikt..
     private boolean servicesConnected() {
         // Check that Google Play services is available
         int resultCode =
@@ -176,14 +164,14 @@ public class MainActivity extends Activity implements
     @Override
     public void onConnected(Bundle dataBundle) {
         // Display the connection status
-        Toast.makeText(this, "Connected", Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, "Connected to Google Play services", Toast.LENGTH_SHORT).show();
         mLocationClient.requestLocationUpdates(mLocationRequest, this);
     }
 
     @Override
     public void onDisconnected() {
         // Display the connection status
-        Toast.makeText(this, "Disconnected. Please re-connect.",
+        Toast.makeText(this, "Disconnected from Google Play services. Please re-connect.",
                 Toast.LENGTH_SHORT).show();
     }
 
@@ -219,25 +207,22 @@ public class MainActivity extends Activity implements
 
     @Override
     public void onLocationChanged(Location location) {
-        // Report to the UI that the location was updated
-//        String msg = "Updated Location: " +
-//                Double.toString(location.getLatitude()) + "," +
-//                Double.toString(location.getLongitude());
-//        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
-        //TODO; remove?
-
+        // Show location in UI
         mTvLatitude.setText(Double.toString(location.getLatitude()));
         mTvLongitude.setText(Double.toString(location.getLongitude()));
 
+        // Get own MAC address to send to master
         WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
         WifiInfo info = manager.getConnectionInfo();
         String address = info.getMacAddress();
 
+        // Get own name
         String name = "";
-        if (mNameInput.getText().length() != 0) {
+        if (mNameInput.getText() != null && mNameInput.getText().length() != 0) {
             name = mNameInput.getText().toString();
         }
 
+        // Create slave object to send to master
         Slave slave = new Slave();
         slave.setIdentifier(address);
         slave.setName(name);
@@ -246,12 +231,5 @@ public class MainActivity extends Activity implements
 
         // Send location to server
         new ClientTask().execute(slave);
-    }
-
-    @Override
-    public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
-        Collection<WifiP2pDevice> deviceList = wifiP2pDeviceList.getDeviceList();
-        Log.d("", "Peers available called. Found peers: " + deviceList.size());
-        //TODO; is dit nog nodig als we vanuit de slave niet connecten?
     }
 }
