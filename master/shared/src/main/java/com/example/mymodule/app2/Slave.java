@@ -2,6 +2,8 @@ package com.example.mymodule.app2;
 
 import java.io.Serializable;
 
+import sun.rmi.runtime.Log;
+
 /**
  * Created by datwelk on 19/06/14.
  */
@@ -18,7 +20,7 @@ public class Slave implements Serializable {
     }
 
     public void setIdentifier(String identifier) {
-        this.mIdentifier = identifier;
+        this.mIdentifier = getTrimmedMAC(identifier);
     }
 
     public String getIdentifier() {
@@ -41,15 +43,21 @@ public class Slave implements Serializable {
         this.mLongitude = longitude;
     }
 
+    public static String getTrimmedMAC(String mac) {
+        return mac.substring(3);
+    }
+
     @Override
     public boolean equals(Object o) {
-        return o instanceof Slave &&
-                ((Slave) o).getIdentifier().equals(this.getIdentifier());
+        return (o instanceof Slave &&
+                ((Slave) o).getIdentifier().equals(this.getIdentifier()));
     }
 
     @Override
     public String toString() {
-        String returnString = "Device Identifier: " + this.mIdentifier;
+        String returnString = "Device Identifier: " + this.mIdentifier +
+                ", latitude: " + mLatitude +
+                ", longitude: " + mLongitude;
 
         return returnString;
     }

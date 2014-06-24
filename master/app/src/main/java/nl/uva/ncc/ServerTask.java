@@ -14,7 +14,7 @@ import com.example.mymodule.app2.Slave;
 /**
  * Created by datwelk on 23/06/14.
  */
-public class ServerTask extends AsyncTask<Void, Void, Void> {
+public class ServerTask extends AsyncTask<Void, Slave, Void> {
     private static ServerTaskListener mServerTaskListener;
 
     public static void setServerTaskListener(ServerTaskListener serverTaskListener) {
@@ -36,6 +36,13 @@ public class ServerTask extends AsyncTask<Void, Void, Void> {
     }
 
     @Override
+    protected void onProgressUpdate(Slave... slaves) {
+        Slave receivedSlave = slaves[0];
+        mServerTaskListener.onLocationReceived(receivedSlave);
+
+    }
+
+    @Override
     protected Void doInBackground(Void... params) {
         ServerSocket serverSocket;
 
@@ -53,7 +60,7 @@ public class ServerTask extends AsyncTask<Void, Void, Void> {
                 Log.d("", "after accept");
 
                 Slave receivedSlave = deserialize(client.getInputStream());
-                mServerTaskListener.onLocationReceived(receivedSlave);
+                publishProgress(receivedSlave);
 
                 Log.d("", "Received location from device: " + receivedSlave);
             } catch (IOException e) {

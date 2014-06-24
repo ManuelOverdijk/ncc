@@ -112,7 +112,7 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
         for (Slave slave : mSlaves) {
             boolean isConnected = false;
             for (WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
-                if (slave.getIdentifier().equals(device.deviceAddress)) {
+                if (slave.getIdentifier().equals(Slave.getTrimmedMAC(device.deviceAddress))) {
                     isConnected = true;
                     break;
                 }
@@ -131,7 +131,7 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
             boolean alreadyConnected = false;
 
             for (Slave slave : mSlaves) {
-                if (slave.getIdentifier().equals(device.deviceAddress)) {
+                if (slave.getIdentifier().equals(Slave.getTrimmedMAC(device.deviceAddress))) {
                     Log.d("", "Already connected to device.");
                     alreadyConnected = true;
                 }
