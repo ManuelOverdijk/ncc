@@ -43,10 +43,8 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
         mReceiver = new WiFiDirectBroadcastReceiver(mManager, mChannel, this);
 
         mIntentFilter = new IntentFilter();
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_STATE_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_PEERS_CHANGED_ACTION);
         mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_CONNECTION_CHANGED_ACTION);
-        mIntentFilter.addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION);
         registerReceiver(mReceiver, mIntentFilter);
 
         // UI stuff
@@ -69,7 +67,6 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
     /*
      * Overrides
      */
-
     @Override
     protected void onResume() {
         super.onResume();
@@ -85,8 +82,6 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        mReceiver.syncStopDiscovery();
-        mReceiver.syncDisconnect();
     }
 
     @Override

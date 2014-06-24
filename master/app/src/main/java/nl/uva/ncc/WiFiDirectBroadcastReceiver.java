@@ -11,8 +11,6 @@ import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.net.wifi.p2p.WifiP2pManager.ConnectionInfoListener;
 import android.util.Log;
 
-import java.util.concurrent.Semaphore;
-
 /**
  * A BroadcastReceiver that notifies of important Wi-Fi p2p events.
  */
@@ -48,74 +46,6 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
         });
     }
 
-    public void syncStopDiscovery() {
-        if (mManager == null || mChannel == null) {
-            return;
-        }
-
-        final Semaphore semaphore = new Semaphore(1, true);
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mManager.stopPeerDiscovery(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                semaphore.release();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                semaphore.release();
-            }
-        });
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void syncDisconnect() {
-        if (mManager == null || mChannel == null) {
-            return;
-        }
-
-        final Semaphore semaphore = new Semaphore(1, true);
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        mManager.cancelConnect(mChannel, new WifiP2pManager.ActionListener() {
-            @Override
-            public void onSuccess() {
-                semaphore.release();
-            }
-
-            @Override
-            public void onFailure(int reason) {
-                semaphore.release();
-            }
-        });
-
-        try {
-            semaphore.acquire();
-        }
-        catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
     /*
      * Broadcast receiver logic / overrides
      */
@@ -129,7 +59,7 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             // a list of all peers. mPeerListListener will receive
             // this list on completion of all peers and will try
             // to connect to each peer in the list.
-            Log.d("", "PEERS CHANGED action. Requesting list of peers.");
+            Log.d("", "Requesting list of peers.");
             mManager.requestPeers(mChannel, mListener);
         }
 
@@ -142,21 +72,21 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
             if (networkInfo != null && networkInfo.isConnected()) {
                 // We are connected with the other device, request connection
                 // info to find group owner IP.
-
                 Log.d("", "requesting connection info");
                 mManager.requestConnectionInfo(mChannel, new ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                        if (!info.groupFormed || !info.isGroupOwner) {
-                            return;
+                        if (info.groupFormed && info.isGroupOwner) {
+                            // We are the owner of the group of devices, aka
+                            // the master. Create a server thread and accept
+                            // incoming connections.
+                            Log.d("", "Group formed, group owner.");
+
+                            new ServerTask().execute();
+                        } else if (info.groupFormed) {
+                            Log.e("", "Master should be group owner. Closing application now");
+                            System.exit(0);
                         }
-
-                        // We are the owner of the group of devices, aka
-                        // the master. Create a server thread and accept
-                        // incoming connections.
-                        Log.d("", "Group formed, group owner.");
-
-                        new ServerTask().execute();
                     }
                 });
             }

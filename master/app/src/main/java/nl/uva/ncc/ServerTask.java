@@ -39,7 +39,6 @@ public class ServerTask extends AsyncTask<Void, Slave, Void> {
     protected void onProgressUpdate(Slave... slaves) {
         Slave receivedSlave = slaves[0];
         mServerTaskListener.onLocationReceived(receivedSlave);
-
     }
 
     @Override
