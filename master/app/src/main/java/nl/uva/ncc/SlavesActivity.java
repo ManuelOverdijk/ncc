@@ -93,6 +93,22 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
         Collection<WifiP2pDevice> deviceList = wifiP2pDeviceList.getDeviceList();
         Log.d("", "Peers available called. Found peers: " + deviceList.size());
 
+        // Remove slaves from mSlaves that aren't connected anymore
+        for (Slave slave : mSlaves) {
+            boolean isConnected = false;
+            for (WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
+                if (slave.getIdentifier().equals(device.deviceAddress)) {
+                    isConnected = true;
+                    break;
+                }
+            }
+
+            if (!isConnected) {
+                mSlaves.remove(slave);
+                mAdapter.notifyDataSetChanged();
+            }
+        }
+
         // Connect to each device that is available.
         for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
             // config is needed to connect. groupOwnerIntent tells the inclination

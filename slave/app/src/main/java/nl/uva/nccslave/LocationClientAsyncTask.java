@@ -2,6 +2,8 @@ package nl.uva.nccslave;
 
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
@@ -26,16 +28,17 @@ public class LocationClientAsyncTask extends AsyncTask<Location, Void, Void> imp
     }
 
     // Serializes an object (Location) into a byte array.
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        Log.d("", "size: " + out.size());
-        return out.toByteArray();
+    public static byte[] marshall(Parcelable parceable) {
+        Parcel parcel = Parcel.obtain();
+        parceable.writeToParcel(parcel, 0);
+        byte[] bytes = parcel.marshall();
+        parcel.recycle(); // not sure if needed or a good idea
+        return bytes;
     }
 
     @Override
-    protected Void doInBackground(Location... location) {
+    protected Void doInBackground(Location... locations) {
+        Location location = locations[0];
         if (groupOwnerAddress == null) {
             Log.d("", "groupOwnerAddress not set");
             return null;
@@ -60,7 +63,7 @@ public class LocationClientAsyncTask extends AsyncTask<Location, Void, Void> imp
             Log.d("", "Connect call returned");
 
             // Send Location
-            byte[] output = serialize(location);
+            byte[] output = marshall(location);
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(output);
             outputStream.close();
