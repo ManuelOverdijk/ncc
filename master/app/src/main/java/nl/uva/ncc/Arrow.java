@@ -38,6 +38,8 @@ public class Arrow extends ImageView implements View.OnTouchListener
 
     int cX = 0;
     int cY = 0;
+    int xTrans = 10;
+    int yTrans = 10;
 
     List<oDevice> oDevices = new ArrayList<oDevice>();
     private int height = 0;
@@ -81,8 +83,10 @@ public class Arrow extends ImageView implements View.OnTouchListener
         bmpArrowResized = Bitmap.createScaledBitmap(bmpArrow, this.thrust, this.thrust, false);
 
         Matrix rotator = new Matrix();
+        rotator.reset();
+        rotator.postTranslate(xTrans += 10, yTrans += 10);
         rotator.postRotate(direction, bmpArrowResized.getWidth() / 2, bmpArrowResized.getHeight() / 2);
-        rotator.postTranslate(cX, cY);
+        //rotator.postTranslate(cX, cY);
         canvas.drawBitmap(bmpArrowResized, rotator, paint);
 
 
