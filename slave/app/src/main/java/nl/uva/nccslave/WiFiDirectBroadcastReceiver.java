@@ -157,16 +157,9 @@ public class WiFiDirectBroadcastReceiver extends BroadcastReceiver {
                 mManager.requestConnectionInfo(mChannel, new ConnectionInfoListener() {
                     @Override
                     public void onConnectionInfoAvailable(WifiP2pInfo info) {
-                        if (!info.groupFormed || !info.isGroupOwner) {
-                            return;
+                        if (info.groupFormed && !info.isGroupOwner) {
+                            LocationClientAsyncTask.setGroupOwnerAddress(info.groupOwnerAddress);
                         }
-
-
-                        // We are the owner of the group of devices, aka
-                        // the master. Create a server thread and accept
-                        // incoming connections.
-                        Log.d("", "Group formed, group owner.");
-
                     }
                 });
             }

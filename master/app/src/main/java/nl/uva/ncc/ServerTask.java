@@ -1,5 +1,8 @@
 package nl.uva.ncc;
 
+import android.location.Location;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.IOException;
@@ -13,6 +16,18 @@ import android.os.AsyncTask;
  * Created by datwelk on 23/06/14.
  */
 public class ServerTask extends AsyncTask<Void, Void, Void>{
+    public static Parcel unmarshall(byte[] bytes) {
+        Parcel parcel = Parcel.obtain();
+        parcel.unmarshall(bytes, 0, bytes.length);
+        parcel.setDataPosition(0); // this is extremely important!
+        return parcel;
+    }
+
+    public static <T> T unmarshall(byte[] bytes, Parcelable.Creator<T> creator) {
+        Parcel parcel = unmarshall(bytes);
+        return creator.createFromParcel(parcel);
+    }
+
     @Override
     protected Void doInBackground(Void... params) {
         ServerSocket serverSocket;
@@ -34,9 +49,11 @@ public class ServerTask extends AsyncTask<Void, Void, Void>{
 
                 Log.d("LocationServerAsyncTask", "Received from client");
 
-                int result = inputstream.read();
+                byte[] receivedBytes = new byte[128];
+                inputstream.read(receivedBytes, 0, 128);
 
-                Log.d("", "received int: " +  result);
+                Location location = unmarshall(receivedBytes, Location.CREATOR);
+                Log.d("", "received location, long: " + location.getLongitude() + " lat: " + location.getLatitude());
             } catch (IOException e) {
                 Log.e("LocationServerAsyncTask", e.getMessage());
                 return null;
