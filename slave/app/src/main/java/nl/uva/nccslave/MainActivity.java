@@ -218,6 +218,7 @@ public class MainActivity extends Activity implements
 //                Double.toString(location.getLatitude()) + "," +
 //                Double.toString(location.getLongitude());
 //        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+        //TODO; remove?
 
         mTvLatitude.setText(Double.toString(location.getLatitude()));
         mTvLongitude.setText(Double.toString(location.getLongitude()));
@@ -239,30 +240,6 @@ public class MainActivity extends Activity implements
     public void onPeersAvailable(WifiP2pDeviceList wifiP2pDeviceList) {
         Collection<WifiP2pDevice> deviceList = wifiP2pDeviceList.getDeviceList();
         Log.d("", "Peers available called. Found peers: " + deviceList.size());
-
-        // Connect to each device that is available.
-//        for (final WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
-//            // config is needed to connect. groupOwnerIntent tells the inclination
-//            // to be the group owner. 0 means least inclination.
-//
-//            WifiP2pConfig config = new WifiP2pConfig();
-//            config.deviceAddress = device.deviceAddress;
-//            config.groupOwnerIntent = 0;
-//
-//            mManager.connect(mChannel, config, new WifiP2pManager.ActionListener() {
-//                @Override
-//                public void onSuccess() {
-//                    // Successfully connected to this device.
-//                    // Request info about device
-//                    Log.d("", "Successfully connected to device");
-//                }
-//
-//                @Override
-//                public void onFailure(int reason) {
-//                    // Failed to connect to this device.
-//                    Log.d("", "Connection failed. reason: " + reason);
-//                }
-//            });
-//        }
+        //TODO; is dit nog nodig als we vanuit de slave niet connecten?
     }
 }

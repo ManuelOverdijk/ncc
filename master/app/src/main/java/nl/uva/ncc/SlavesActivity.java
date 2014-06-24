@@ -7,6 +7,7 @@ import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
+import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -20,8 +21,7 @@ import java.util.Collection;
 import se.bitcraze.crazyfliecontrol.R;
 import com.example.mymodule.app2.Slave;
 
-public class SlavesActivity extends Activity implements WifiP2pManager.PeerListListener {
-
+public class SlavesActivity extends Activity implements PeerListListener, ServerTaskListener {
     ListView mListView;
     Button mButton;
     ArrayAdapter mAdapter;
@@ -62,6 +62,8 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
                 mReceiver.startDiscovery();
             }
         });
+
+        ServerTask.setServerTaskListener(this);
     }
 
     /*
@@ -85,6 +87,20 @@ public class SlavesActivity extends Activity implements WifiP2pManager.PeerListL
         super.onDestroy();
         mReceiver.syncStopDiscovery();
         mReceiver.syncDisconnect();
+    }
+
+    @Override
+    public void onLocationReceived(Slave receivedSlave) {
+        for (Slave slave : mSlaves) {
+            if (slave.equals(receivedSlave)) {
+                mSlaves.remove(slave);
+                mSlaves.add(receivedSlave);
+                mAdapter.notifyDataSetChanged();
+                return;
+            }
+        }
+
+        Log.e("", "Received location from slave not known in mSlaves");
     }
 
     @Override
