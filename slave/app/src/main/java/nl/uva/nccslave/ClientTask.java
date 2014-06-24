@@ -8,11 +8,13 @@ import android.util.Log;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import com.example.mymodule.app2.Slave;
 
 /**
  * Sends GPS location to server in an asynchronous task. Should be called every time the
@@ -60,11 +62,10 @@ public class ClientTask extends AsyncTask<Slave, Void, Void> implements Serializ
             socket.connect(new InetSocketAddress(groupOwnerAddress, 8888), 500);
             Log.d("", "Connect call returned");
 
-            // Send Location
-            byte[] output = marshall(slave);
             OutputStream outputStream = socket.getOutputStream();
-            outputStream.write(output);
-            outputStream.close();
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+            objectOutputStream.writeObject(slave);
+            objectOutputStream.close();
         } catch (FileNotFoundException e) {
             Log.e("", e.toString());
         } catch (IOException e) {

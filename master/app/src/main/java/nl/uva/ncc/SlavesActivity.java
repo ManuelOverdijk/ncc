@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import se.bitcraze.crazyfliecontrol.R;
+import com.example.mymodule.app2.Slave;
 
 public class SlavesActivity extends Activity implements WifiP2pManager.PeerListListener {
 

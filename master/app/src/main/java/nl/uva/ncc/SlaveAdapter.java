@@ -10,6 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import se.bitcraze.crazyfliecontrol.R;
+import com.example.mymodule.app2.Slave;
 
 /**
  * Created by datwelk on 19/06/14.
@@ -32,8 +33,8 @@ public class SlaveAdapter extends ArrayAdapter {
         }
 
         Slave slave = this.mItems.get(position);
-        String latitude = String.valueOf(slave.getLocation().getLatitude());
-        String longitude = String.valueOf(slave.getLocation().getLongitude());
+        String latitude = String.valueOf(slave.getLatitude());
+        String longitude = String.valueOf(slave.getLongitude());
         String locationString = "Lat: " + latitude + ", Lon: " + longitude;
 
         TextView textViewCoordinates = (TextView)view.findViewById(R.id.textViewCoordinates);

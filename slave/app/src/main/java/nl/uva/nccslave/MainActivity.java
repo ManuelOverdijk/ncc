@@ -19,6 +19,7 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mymodule.app2.Slave;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -227,7 +228,8 @@ public class MainActivity extends Activity implements
 
         Slave slave = new Slave();
         slave.setIdentifier(address);
-        slave.setLocation(location);
+        slave.setLatitude(location.getLatitude());
+        slave.setLongitude(location.getLongitude());
 
         // Send location to server
         new ClientTask().execute(slave);

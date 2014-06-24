@@ -7,10 +7,12 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 import android.os.AsyncTask;
+import com.example.mymodule.app2.Slave;
 
 /**
  * Created by datwelk on 23/06/14.
@@ -43,24 +45,19 @@ public class ServerTask extends AsyncTask<Void, Void, Void>{
             try {
                 Log.d("", "before accept");
                 Socket client = serverSocket.accept();
-                Log.d("", "" + client.getRemoteSocketAddress().toString());
-                Log.d("", client.getInetAddress().getHostAddress());
                 Log.d("", "after accept");
 
-                client.getInetAddress().getHostad
-
                 InputStream inputstream = client.getInputStream();
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputstream);
+                Slave slave = (Slave)objectInputStream.readObject();
 
-                Log.d("LocationServerAsyncTask", "Received from client");
-
-                byte[] receivedBytes = new byte[128];
-                inputstream.read(receivedBytes, 0, 128);
-
-                Location location = unmarshall(receivedBytes, Location.CREATOR);
-                Log.d("", "received location, long: " + location.getLongitude() + " lat: " + location.getLatitude());
+                Log.d("", "Received lat: " + String.valueOf(slave.getLatitude()) + " lon: " + String.valueOf(slave.getLongitude()));
+                Log.d("", "Received from device: " + slave.getIdentifier());
             } catch (IOException e) {
                 Log.e("LocationServerAsyncTask", e.getMessage());
                 return null;
+            } catch (ClassNotFoundException e) {
+                e.printStackTrace();
             }
         }
     }

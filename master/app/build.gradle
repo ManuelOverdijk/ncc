@@ -2,23 +2,25 @@ apply plugin: 'android'
 
 android {
     compileSdkVersion 19
-    buildToolsVersion "19.1.0"
-
+    buildToolsVersion '19.1.0'
     defaultConfig {
-        applicationId "se.bitcraze.crazyfliecontrol"
+        applicationId 'se.bitcraze.crazyfliecontrol'
         minSdkVersion 16
         targetSdkVersion 19
     }
-
     buildTypes {
         release {
             runProguard false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+    productFlavors {
+    }
 }
 
 dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:support-v4:+'
     compile 'com.android.support:appcompat-v7:19.+'
+    compile project(':shared')
 }
