@@ -1,5 +1,6 @@
 package nl.uva.ncc;
 
+import android.bluetooth.BluetoothClass;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;

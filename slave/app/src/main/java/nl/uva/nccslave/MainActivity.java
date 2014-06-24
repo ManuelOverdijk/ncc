@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.location.Location;
+import android.net.wifi.WifiInfo;
+import android.net.wifi.WifiManager;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -219,8 +221,16 @@ public class MainActivity extends Activity implements
         mTvLatitude.setText(Double.toString(location.getLatitude()));
         mTvLongitude.setText(Double.toString(location.getLongitude()));
 
+        WifiManager manager = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiInfo info = manager.getConnectionInfo();
+        String address = info.getMacAddress();
+
+        Slave slave = new Slave();
+        slave.setIdentifier(address);
+        slave.setLocation(location);
+
         // Send location to server
-        new ClientTask().execute(location);
+        new ClientTask().execute(slave);
     }
 
     @Override

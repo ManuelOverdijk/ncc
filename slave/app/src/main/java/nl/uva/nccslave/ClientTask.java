@@ -20,7 +20,7 @@ import java.net.Socket;
  * Sends GPS location to server in an asynchronous task. Should be called every time the
  * location changes. groupOwnerAddress should be set first.
  */
-public class ClientTask extends AsyncTask<Location, Void, Void> implements Serializable {
+public class ClientTask extends AsyncTask<Slave, Void, Void> implements Serializable {
     private static InetAddress groupOwnerAddress;
 
     public static void setGroupOwnerAddress(InetAddress address) {
@@ -37,15 +37,15 @@ public class ClientTask extends AsyncTask<Location, Void, Void> implements Seria
     }
 
     @Override
-    protected Void doInBackground(Location... locations) {
-        Location location = locations[0];
+    protected Void doInBackground(Slave... slaves) {
+        Slave slave = slaves[0];
         if (groupOwnerAddress == null) {
             Log.d("", "groupOwnerAddress not set");
             return null;
         }
 
-        if (location == null) {
-            Log.d("", "No location provided to send.");
+        if (slave == null) {
+            Log.d("", "No slave provided to send.");
             return null;
         }
 
@@ -63,7 +63,7 @@ public class ClientTask extends AsyncTask<Location, Void, Void> implements Seria
             Log.d("", "Connect call returned");
 
             // Send Location
-            byte[] output = marshall(location);
+            byte[] output = marshall(slave);
             OutputStream outputStream = socket.getOutputStream();
             outputStream.write(output);
             outputStream.close();

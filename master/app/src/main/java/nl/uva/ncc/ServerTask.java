@@ -45,6 +45,8 @@ public class ServerTask extends AsyncTask<Void, Void, Void>{
                 Socket client = serverSocket.accept();
                 Log.d("", "after accept");
 
+                client.getInetAddress().getHostad
+
                 InputStream inputstream = client.getInputStream();
 
                 Log.d("LocationServerAsyncTask", "Received from client");
