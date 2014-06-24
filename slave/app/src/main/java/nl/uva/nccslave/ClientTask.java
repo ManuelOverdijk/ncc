@@ -2,12 +2,13 @@ package nl.uva.nccslave;
 
 import android.location.Location;
 import android.os.AsyncTask;
+import android.os.Parcel;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
@@ -27,16 +28,17 @@ public class ClientTask extends AsyncTask<Location, Void, Void> implements Seria
     }
 
     // Serializes an object (Location) into a byte array.
-    public static byte[] serialize(Object obj) throws IOException {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(out);
-        os.writeObject(obj);
-        Log.d("", "size: " + out.size());
-        return out.toByteArray();
+    public static byte[] marshall(Parcelable parceable) {
+        Parcel parcel = Parcel.obtain();
+        parceable.writeToParcel(parcel, 0);
+        byte[] bytes = parcel.marshall();
+        parcel.recycle(); // not sure if needed or a good idea
+        return bytes;
     }
 
     @Override
-    protected Void doInBackground(Location... location) {
+    protected Void doInBackground(Location... locations) {
+        Location location = locations[0];
         if (groupOwnerAddress == null) {
             Log.d("", "groupOwnerAddress not set");
             return null;
@@ -60,13 +62,11 @@ public class ClientTask extends AsyncTask<Location, Void, Void> implements Seria
             socket.connect(new InetSocketAddress(groupOwnerAddress, 8888), 500);
             Log.d("", "Connect call returned");
 
+            // Send Location
+            byte[] output = marshall(location);
             OutputStream outputStream = socket.getOutputStream();
-            ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-            objectOutputStream.writeObject(location);
-            objectOutputStream.close();
-
-            Log.d("", "Transmitted location");
-
+            outputStream.write(output);
+            outputStream.close();
         } catch (FileNotFoundException e) {
             Log.e("", e.toString());
         } catch (IOException e) {

@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.location.Location;
-import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
 import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
@@ -221,7 +220,7 @@ public class MainActivity extends Activity implements
         mTvLongitude.setText(Double.toString(location.getLongitude()));
 
         // Send location to server
-        new LocationClientAsyncTask().execute(location);
+        new ClientTask().execute(location);
     }
 
     @Override
