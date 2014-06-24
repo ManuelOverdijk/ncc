@@ -1,6 +1,7 @@
 package nl.uva.ncc;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +42,10 @@ public class SlaveAdapter extends ArrayAdapter {
         textViewCoordinates.setText(locationString);
 
         TextView textViewDeviceId = (TextView)view.findViewById(R.id.textViewDeviceID);
-        textViewDeviceId.setText(slave.getIdentifier());
+        if (slave.getName() == null || slave.getName().length() == 0)
+            textViewDeviceId.setText(slave.getIdentifier());
+        else
+            textViewDeviceId.setText(slave.getName());
 
         return view;
     }

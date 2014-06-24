@@ -10,13 +10,15 @@ import sun.rmi.runtime.Log;
 public class Slave implements Serializable {
     static final long serialVersionUID = 1337;
     private String mIdentifier;
+    private String mName;
     private double mLatitude;
     private double mLongitude;
 
     public Slave() {
         this.mIdentifier = "Device ID";
-        mLatitude = Double.NaN;
-        mLongitude = Double.NaN;
+        this.mName = null;
+        this.mLatitude = Double.NaN;
+        this.mLongitude = Double.NaN;
     }
 
     public void setIdentifier(String identifier) {
@@ -25,6 +27,14 @@ public class Slave implements Serializable {
 
     public String getIdentifier() {
         return this.mIdentifier;
+    }
+
+    public void setName(String name) {
+        this.mName = name;
+    }
+
+    public String getName() {
+        return this.mName;
     }
 
     public double getLatitude() {

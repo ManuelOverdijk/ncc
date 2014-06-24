@@ -13,9 +13,13 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,7 +55,8 @@ public class MainActivity extends Activity implements
 
     private TextView mTvLatitude;
     private TextView mTvLongitude;
-    Button mButton;
+    private Button mButton;
+    private EditText mNameInput;
 
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
@@ -87,6 +92,7 @@ public class MainActivity extends Activity implements
         mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
 
         mButton = (Button) findViewById(R.id.button_discover);
+        mNameInput = (EditText) findViewById(R.id.input_name);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -227,8 +233,14 @@ public class MainActivity extends Activity implements
         WifiInfo info = manager.getConnectionInfo();
         String address = info.getMacAddress();
 
+        String name = "";
+        if (mNameInput.getText().length() != 0) {
+            name = mNameInput.getText().toString();
+        }
+
         Slave slave = new Slave();
         slave.setIdentifier(address);
+        slave.setName(name);
         slave.setLatitude(location.getLatitude());
         slave.setLongitude(location.getLongitude());
 
