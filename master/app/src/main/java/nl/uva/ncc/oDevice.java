@@ -52,7 +52,8 @@ public class oDevice
     }
 
     public void setX(int width, double lon) {
-        this.mX = (int) ((width/360.0) * (180 + lon));;
+        //this.mX = (int) ((width/360.0) * (180 + lon));
+        this.mX = lon;
     }
 
     public double getY() {
@@ -60,6 +61,7 @@ public class oDevice
     }
 
     public void setY(int height, double lat) {
-        this.mY = (int) ((height/180.0) * (90 - lat));
+        //this.mY = (int) ((height/180.0) * (90 - lat));
+        this.mY = lat;
     }
 }

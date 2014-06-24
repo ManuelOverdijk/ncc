@@ -10,6 +10,9 @@ import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Paint.Style;
 import android.graphics.Path;
+import android.util.Log;
+import android.view.MotionEvent;
+import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -22,7 +25,7 @@ import se.bitcraze.crazyfliecontrol.R;
 /**
  * Created by terry on 20-6-14.
  */
-public class Arrow extends ImageView
+public class Arrow extends ImageView implements View.OnTouchListener
 {
     Paint paint;
     Paint fillPaint;
@@ -65,13 +68,13 @@ public class Arrow extends ImageView
 
         if(oDevices.isEmpty())
         {
-            cX = (width - bmpArrowResized.getWidth()) / 2;
-            cY = (height - bmpArrowResized.getHeight()) / 2;
+            //cX = (width - bmpArrowResized.getWidth()) / 2;
+            //cY = (height - bmpArrowResized.getHeight()) / 2;
 
             oDevices.add(new oDevice(50,50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
             oDevices.add(new oDevice(50, height - 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
             oDevices.add(new oDevice(width - 50, height - 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
-            oDevices.add(new oDevice(width - 50, 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));gr
+            oDevices.add(new oDevice(width - 50, 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
         }
         drawDevicesOnCanvas(oDevices, canvas);
 
@@ -82,21 +85,22 @@ public class Arrow extends ImageView
         rotator.postTranslate(cX, cY);
         canvas.drawBitmap(bmpArrowResized, rotator, paint);
 
+
         super.onDraw(canvas);
     }
 
-    public void setSimulation(int direction, int thrust, double lon, double lat) {
+    public void setSimulation(int direction, int thrust) {
         this.direction = direction;
         this.thrust = thrust < 100 ? thrust : 100;
-        this.cX = (int) ((width/360.0) * (180 + lon));
-        this.cY = (int) ((height/180.0) * (90 - lat));
+        //this.cX = (int) ((width/360.0) * (180 + lon));
+        //this.cY = (int) ((height/180.0) * (90 - lat));
         this.invalidate();
     }
 
     public int getDirection() {
         return this.direction;
     }
-    public int getThrust()    {
+    public int getThrust() {
         return this.thrust;
     }
 
@@ -122,8 +126,17 @@ public class Arrow extends ImageView
 
         for (oDevice i : devicesList) {
             canvas.drawCircle((int) i.getX(), (int) i.getY(), (int) i.getWidth(), fillPaint);
+            // Log.d("test", i.getX() + " " + i.getY());
             canvas.drawBitmap(bmpDeviceResized, (int) i.getX() - (int) i.getWidth() / 2, (int) i.getY() - (int) i.getHeight() / 2, null);
         }
 
+    }
+
+    @Override
+    public boolean onTouch(View view, MotionEvent motionEvent) {
+
+
+
+        return true;
     }
 }
