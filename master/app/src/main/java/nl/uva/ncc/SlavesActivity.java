@@ -2,6 +2,7 @@ package nl.uva.ncc;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.IntentFilter;
 import android.net.wifi.p2p.WifiP2pConfig;
 import android.net.wifi.p2p.WifiP2pDevice;
@@ -9,11 +10,13 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.util.Log;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,6 +27,7 @@ import com.example.mymodule.app2.Slave;
 public class SlavesActivity extends Activity implements PeerListListener, ServerTaskListener {
     ListView mListView;
     Button mButton;
+    Button mButtonVisualize;
     ArrayAdapter mAdapter;
     ArrayList<Slave> mSlaves;
 
@@ -58,6 +62,32 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
             @Override
             public void onClick(View view) {
                 mReceiver.startDiscovery();
+                Toast.makeText(getApplicationContext(), "Discovering..", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        mButtonVisualize = (Button) findViewById(R.id.button_visualize);
+        mButtonVisualize.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ArrayList<String> mSlavesToString = new ArrayList<String>();
+                ArrayList<String> mSlavesLatitude = new ArrayList<String>();
+                ArrayList<String> mSlavesLongitude = new ArrayList<String>();
+                for(Slave slave : mSlaves) {
+                    if(slave.getName() == null || slave.getName().length() == 0) {
+                        mSlavesToString.add(slave.getIdentifier());
+                    } else {
+                        mSlavesToString.add(slave.getName());
+                    }
+                    mSlavesLatitude.add(Double.toString(slave.getLatitude()));
+                    mSlavesLongitude.add(Double.toString(slave.getLongitude()));
+                }
+
+                Intent intent = new Intent(getApplicationContext(), SlavesSimulate.class);
+                intent.putStringArrayListExtra("slavesnames", mSlavesToString);
+                intent.putStringArrayListExtra("slaveslat", mSlavesLatitude);
+                intent.putStringArrayListExtra("slaveslon", mSlavesLongitude);
+                startActivity(intent);
             }
         });
 
@@ -93,6 +123,7 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
                 mAdapter.notifyDataSetChanged();
                 return;
             }
+
         }
 
         Log.e("", "Received location from slave not known in mSlaves");
@@ -150,6 +181,7 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
                     Slave slave = new Slave();
                     slave.setIdentifier(device.deviceAddress);
                     mSlaves.add(slave);
+                    mButtonVisualize.setEnabled(true);
                     mAdapter.notifyDataSetChanged();
                 }
 

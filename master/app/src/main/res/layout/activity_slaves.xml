@@ -9,14 +9,30 @@
     android:orientation="vertical"
     tools:context="nl.uva.ncc.SlavesActivity">
 
-    <Button
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal">
+    <Button
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
         android:text="Discover"
-        android:id="@+id/button_discover"/>
+        android:id="@+id/button_discover"
+        android:layout_weight="1"/>
+    <Button
+        android:id="@+id/button_visualize"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="@string/visualize"
+        android:layout_weight="1"
+        android:enabled="false"
+        />
+    </LinearLayout>
     <ListView
         android:id="@+id/listView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
+
+
 
 </LinearLayout>
