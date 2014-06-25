@@ -116,15 +116,25 @@ public class SlavesActivity extends Activity implements PeerListListener, Server
 
     @Override
     public void onLocationReceived(Slave receivedSlave) {
+        ArrayList<Slave> toAdd = new ArrayList<Slave>();
+        ArrayList<Slave> toRemove = new ArrayList<Slave>();
+
         for (Slave slave : mSlaves) {
             if (slave.equals(receivedSlave)) {
-                mSlaves.remove(slave);
-                mSlaves.add(receivedSlave);
-                mAdapter.notifyDataSetChanged();
-                return;
+                toRemove.add(slave);
+                //mSlaves.remove(slave);
+                toAdd.add(receivedSlave);
+                //mSlaves.add(receivedSlave);
+                //mAdapter.notifyDataSetChanged();
+                break;
             }
 
+
         }
+
+        mSlaves.removeAll(toRemove);
+        mSlaves.addAll(toAdd);
+        mAdapter.notifyDataSetChanged();
 
         Log.e("", "Received location from slave not known in mSlaves");
     }
