@@ -97,14 +97,14 @@ public class SlavesSimulate extends Activity {
 
         else {
             // Get smallest and largest lats and longs to scale properly
-            float smallestLon = Float.parseFloat(mSlavesLon.get(0));
-            float largestLon = Float.parseFloat(mSlavesLon.get(0));
-            float smallestLat = Float.parseFloat(mSlavesLat.get(0));
-            float largestLat = Float.parseFloat(mSlavesLat.get(0));
+            double smallestLon = Double.parseDouble(mSlavesLon.get(0));
+            double largestLon = Double.parseDouble(mSlavesLon.get(0));
+            double smallestLat = Double.parseDouble(mSlavesLat.get(0));
+            double largestLat = Double.parseDouble(mSlavesLat.get(0));
 
             for (int i = 1; i < nSlaves; i++) {
-                float lon = Float.parseFloat(mSlavesLon.get(i));
-                float lat = Float.parseFloat(mSlavesLat.get(i));
+                double lon = Double.parseDouble(mSlavesLon.get(i));
+                double lat = Double.parseDouble(mSlavesLat.get(i));
 
                 if (lon < smallestLon) {
                     smallestLon = lon;
@@ -119,8 +119,8 @@ public class SlavesSimulate extends Activity {
                 }
             }
 
-            float totalLonDiff = abs(largestLon - smallestLon);
-            float totalLatDiff = abs(largestLat - smallestLat);
+            double totalLonDiff = abs(largestLon - smallestLon);
+            double totalLatDiff = abs(largestLat - smallestLat);
 
             Random r = new Random();
             for (int i = 0; i < nSlaves; i++) {
@@ -129,11 +129,11 @@ public class SlavesSimulate extends Activity {
                 TextView deviceTextview = new TextView(this);
                 deviceTextview.setText(mNames.get(i) + " " + mSlavesLat.get(i) + " " + mSlavesLon.get(i));
 
-                float lon = Float.parseFloat(mSlavesLon.get(i));
-                float lat = Float.parseFloat(mSlavesLat.get(i));
+                Double lon = Double.parseDouble(mSlavesLon.get(i));
+                Double lat = Double.parseDouble(mSlavesLat.get(i));
 
-                float lonDiff = abs(lon - smallestLon);
-                float latDiff = abs(lat - smallestLat);
+                double lonDiff = abs(lon - smallestLon);
+                double latDiff = abs(lat - smallestLat);
 
                 double xScale = lonDiff / totalLonDiff;
                 double yScale = latDiff / totalLatDiff;
