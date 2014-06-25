@@ -60,16 +60,6 @@ public class SlavesSimulate extends Activity {
 //        });
     }
 
-    @Override
-    public void onWindowFocusChanged(boolean hasFocus) {
-        super.onWindowFocusChanged(hasFocus);
-        updateSizeInfo();
-    }
-
-    public void updateSizeInfo() {
-
-    }
-
     private void visualize_devices() {
         Intent intent = getIntent();
         // get the names and coordinates of connected devices
@@ -80,7 +70,6 @@ public class SlavesSimulate extends Activity {
 
         // add new textview with info to layout for every device
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relative_layout);
-        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -93,6 +82,8 @@ public class SlavesSimulate extends Activity {
         }
 
         else if (nSlaves == 1) {
+            RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
             TextView deviceTextview = new TextView(this);
             deviceTextview.setText(mNames.get(0) + " " + mSlavesLat.get(0) + " " + mSlavesLon.get(0));
             lp.leftMargin = canvasWidth / 2;
@@ -133,6 +124,8 @@ public class SlavesSimulate extends Activity {
 
             Random r = new Random();
             for (int i = 0; i < nSlaves; i++) {
+                RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
+
                 TextView deviceTextview = new TextView(this);
                 deviceTextview.setText(mNames.get(i) + " " + mSlavesLat.get(i) + " " + mSlavesLon.get(i));
 
@@ -145,8 +138,7 @@ public class SlavesSimulate extends Activity {
                 double xScale = lonDiff / totalLonDiff;
                 double yScale = latDiff / totalLatDiff;
 
-                lp.leftMargin = 50 + (int) (xScale * (canvasWidth - 100));
-                lp.topMargin = 50 + (int) (yScale * (canvasHeight - 100));
+                lp.setMargins(50 + (int) (xScale * (canvasWidth - 100)), 50 + (int) (yScale * (canvasHeight - 100)), 0, 0);
 
                 //add view to layout
                 relativeLayout.addView(deviceTextview, lp);
