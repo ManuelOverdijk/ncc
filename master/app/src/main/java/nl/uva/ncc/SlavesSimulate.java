@@ -10,14 +10,9 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Display;
-import android.view.View;
-import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,7 +30,6 @@ public class SlavesSimulate extends Activity {
     ListView mListView;
     ArrayAdapter mAdapter;
     Arrow arrow;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -15,10 +15,10 @@ import com.example.mymodule.app2.Slave;
  * Created by datwelk on 23/06/14.
  */
 public class ServerTask extends AsyncTask<Void, Slave, Void> {
-    private static ServerTaskListener mServerTaskListener;
+    private static SlaveLocationListener mSlaveLocationListener;
 
-    public static void setServerTaskListener(ServerTaskListener serverTaskListener) {
-        mServerTaskListener = serverTaskListener;
+    public static void setServerTaskListener(SlaveLocationListener slaveLocationListener) {
+        mSlaveLocationListener = slaveLocationListener;
     }
 
     public static Slave deserialize(InputStream inputStream) {
@@ -38,7 +38,7 @@ public class ServerTask extends AsyncTask<Void, Slave, Void> {
     @Override
     protected void onProgressUpdate(Slave... slaves) {
         Slave receivedSlave = slaves[0];
-        mServerTaskListener.onLocationReceived(receivedSlave);
+        mSlaveLocationListener.onLocationReceived(receivedSlave);
     }
 
     @Override

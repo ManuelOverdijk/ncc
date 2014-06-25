@@ -10,7 +10,6 @@ import android.net.wifi.p2p.WifiP2pDeviceList;
 import android.net.wifi.p2p.WifiP2pManager;
 import android.net.wifi.p2p.WifiP2pManager.PeerListListener;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -24,7 +23,7 @@ import java.util.Collection;
 import se.bitcraze.crazyfliecontrol.R;
 import com.example.mymodule.app2.Slave;
 
-public class SlavesActivity extends Activity implements PeerListListener, ServerTaskListener {
+public class SlavesActivity extends Activity implements PeerListListener, SlaveLocationListener {
     ListView mListView;
     Button mButton;
     Button mButtonVisualize;
