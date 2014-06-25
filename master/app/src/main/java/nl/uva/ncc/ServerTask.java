@@ -17,7 +17,7 @@ import com.example.mymodule.app2.Slave;
 public class ServerTask extends AsyncTask<Void, Slave, Void> {
     private static SlaveLocationListener mSlaveLocationListener;
 
-    public static void setServerTaskListener(SlaveLocationListener slaveLocationListener) {
+    public static void setmSlaveLocationListener(SlaveLocationListener slaveLocationListener) {
         mSlaveLocationListener = slaveLocationListener;
     }
 

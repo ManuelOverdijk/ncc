@@ -24,6 +24,7 @@ import se.bitcraze.crazyfliecontrol.R;
 import com.example.mymodule.app2.Slave;
 
 public class SlavesActivity extends Activity implements PeerListListener, SlaveLocationListener {
+    boolean currentActivity;
     ListView mListView;
     Button mButton;
     Button mButtonVisualize;
@@ -69,28 +70,38 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         mButtonVisualize.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ArrayList<String> mSlavesToString = new ArrayList<String>();
-                ArrayList<String> mSlavesLatitude = new ArrayList<String>();
-                ArrayList<String> mSlavesLongitude = new ArrayList<String>();
-                for(Slave slave : mSlaves) {
-                    if(slave.getName() == null || slave.getName().length() == 0) {
-                        mSlavesToString.add(slave.getIdentifier());
-                    } else {
-                        mSlavesToString.add(slave.getName());
-                    }
-                    mSlavesLatitude.add(Double.toString(slave.getLatitude()));
-                    mSlavesLongitude.add(Double.toString(slave.getLongitude()));
-                }
+                currentActivity = false;
+                visualize_devices();
 
-                Intent intent = new Intent(getApplicationContext(), SlavesSimulate.class);
-                intent.putStringArrayListExtra("slavesnames", mSlavesToString);
-                intent.putStringArrayListExtra("slaveslat", mSlavesLatitude);
-                intent.putStringArrayListExtra("slaveslon", mSlavesLongitude);
-                startActivity(intent);
             }
         });
 
-        ServerTask.setServerTaskListener(this);
+        ServerTask.setmSlaveLocationListener(this);
+    }
+
+    public void visualize_devices() {
+        // Only if SlavesSimulate is active or should be active
+        if (currentActivity)
+            return;
+
+        ArrayList<String> mSlavesToString = new ArrayList<String>();
+        ArrayList<String> mSlavesLatitude = new ArrayList<String>();
+        ArrayList<String> mSlavesLongitude = new ArrayList<String>();
+        for(Slave slave : mSlaves) {
+            if(slave.getName() == null || slave.getName().length() == 0) {
+                mSlavesToString.add(slave.getIdentifier());
+            } else {
+                mSlavesToString.add(slave.getName());
+            }
+            mSlavesLatitude.add(Double.toString(slave.getLatitude()));
+            mSlavesLongitude.add(Double.toString(slave.getLongitude()));
+        }
+
+        Intent intent = new Intent(getApplicationContext(), SlavesSimulate.class);
+        intent.putStringArrayListExtra("slavesnames", mSlavesToString);
+        intent.putStringArrayListExtra("slaveslat", mSlavesLatitude);
+        intent.putStringArrayListExtra("slaveslon", mSlavesLongitude);
+        startActivity(intent);
     }
 
     /*
@@ -100,6 +111,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, mIntentFilter);
+        currentActivity = true;
     }
 
     @Override
@@ -117,12 +129,15 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
     public void onLocationReceived(Slave receivedSlave) {
         int index = mSlaves.indexOf(receivedSlave);
 
+
         if (index == -1) {
             Log.e("", "Received location from slave not known in mSlaves");
             return;
         } else {
             mSlaves.set(index, receivedSlave);
+            mAdapter.notifyDataSetChanged();
         }
+        visualize_devices();
     }
 
     @Override
@@ -177,7 +192,6 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
                     Slave slave = new Slave();
                     slave.setIdentifier(device.deviceAddress);
                     mSlaves.add(slave);
-                    mButtonVisualize.setEnabled(true);
                     mAdapter.notifyDataSetChanged();
                 }
 
@@ -187,6 +201,11 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
                     Log.d("", "Connection failed. reason: " + reason);
                 }
             });
+        }
+        if (mSlaves.size() == 0) {
+            mButtonVisualize.setEnabled(false);
+        } else {
+            mButtonVisualize.setEnabled(true);
         }
     }
 }

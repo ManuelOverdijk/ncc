@@ -17,6 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.example.mymodule.app2.Slave;
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -30,6 +31,10 @@ public class SlavesSimulate extends Activity {
     ListView mListView;
     ArrayAdapter mAdapter;
     Arrow arrow;
+    ArrayList<String> mNames;
+    ArrayList<Double> mSlavesLon;
+    ArrayList<Double> mSlavesLat;
+    int nSlaves;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,7 +47,11 @@ public class SlavesSimulate extends Activity {
 
         setContentView(R.layout.activity_slaves_simulate);
 
-        visualize_devices();
+        mNames = new ArrayList<String>();
+        mSlavesLat = new ArrayList<Double>();
+        mSlavesLon = new ArrayList<Double>();
+
+        processIntentData();
 //        arrow = new Arrow(this);
 //        setContentView(arrow);
 //
@@ -54,16 +63,39 @@ public class SlavesSimulate extends Activity {
 //        });
     }
 
-    private void visualize_devices() {
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        //must store the new intent unless getIntent() will return the old one
+        setIntent(intent);
+        processIntentData();
+    }
+
+    public void processIntentData() {
         Intent intent = getIntent();
         // get the names and coordinates of connected devices
-        ArrayList<String> mNames = intent.getStringArrayListExtra("slavesnames");
-        ArrayList<String> mSlavesLat = intent.getStringArrayListExtra("slaveslat");
-        ArrayList<String> mSlavesLon = intent.getStringArrayListExtra("slaveslon");
-        int nSlaves = mNames.size();
+        mNames = intent.getStringArrayListExtra("slavesnames");
 
+        ArrayList<String> mSlavesLatStr = intent.getStringArrayListExtra("slaveslat");
+        ArrayList<String> mSlavesLonStr = intent.getStringArrayListExtra("slaveslon");
+
+        nSlaves = mNames.size();
+
+        mSlavesLat.clear();
+        mSlavesLon.clear();
+        for (int i = 0; i < nSlaves; i++) {
+            mSlavesLat.add(Double.parseDouble(mSlavesLatStr.get(0)));
+            mSlavesLon.add(Double.parseDouble(mSlavesLonStr.get(0)));
+        }
+
+        visualize_devices();
+    }
+
+    private void visualize_devices() {
         // add new textview with info to layout for every device
         RelativeLayout relativeLayout = (RelativeLayout) findViewById(R.id.relative_layout);
+
+        // Remove all text views
+        relativeLayout.removeAllViews();
 
         Display display = getWindowManager().getDefaultDisplay();
         Point size = new Point();
@@ -75,7 +107,7 @@ public class SlavesSimulate extends Activity {
             return;
         }
 
-        else if (nSlaves == 1) {
+        if (nSlaves == 1) {
             RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
             TextView deviceTextview = new TextView(this);
@@ -91,14 +123,14 @@ public class SlavesSimulate extends Activity {
 
         else {
             // Get smallest and largest lats and longs to scale properly
-            double smallestLon = Double.parseDouble(mSlavesLon.get(0));
-            double largestLon = Double.parseDouble(mSlavesLon.get(0));
-            double smallestLat = Double.parseDouble(mSlavesLat.get(0));
-            double largestLat = Double.parseDouble(mSlavesLat.get(0));
+            double smallestLon = mSlavesLon.get(0);
+            double largestLon = mSlavesLon.get(0);
+            double smallestLat = mSlavesLat.get(0);
+            double largestLat = mSlavesLat.get(0);
 
             for (int i = 1; i < nSlaves; i++) {
-                double lon = Double.parseDouble(mSlavesLon.get(i));
-                double lat = Double.parseDouble(mSlavesLat.get(i));
+                double lon = mSlavesLon.get(i);
+                double lat = mSlavesLat.get(i);
 
                 if (lon < smallestLon) {
                     smallestLon = lon;
@@ -116,15 +148,14 @@ public class SlavesSimulate extends Activity {
             double totalLonDiff = abs(largestLon - smallestLon);
             double totalLatDiff = abs(largestLat - smallestLat);
 
-            Random r = new Random();
             for (int i = 0; i < nSlaves; i++) {
                 RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
 
                 TextView deviceTextview = new TextView(this);
                 deviceTextview.setText(mNames.get(i) + " " + mSlavesLat.get(i) + " " + mSlavesLon.get(i));
 
-                Double lon = Double.parseDouble(mSlavesLon.get(i));
-                Double lat = Double.parseDouble(mSlavesLat.get(i));
+                Double lon = mSlavesLon.get(i);
+                Double lat = mSlavesLat.get(i);
 
                 double lonDiff = abs(lon - smallestLon);
                 double latDiff = abs(lat - smallestLat);

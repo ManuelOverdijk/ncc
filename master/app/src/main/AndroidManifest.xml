@@ -48,7 +48,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="nl.uva.ncc.SlavesSimulate" />
+        <activity android:name="nl.uva.ncc.SlavesSimulate" android:launchMode="singleTask"/>
     </application>
 
 </manifest>
