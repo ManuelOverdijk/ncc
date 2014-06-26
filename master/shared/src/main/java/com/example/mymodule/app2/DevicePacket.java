@@ -2,10 +2,6 @@ package com.example.mymodule.app2;
 
 import java.io.Serializable;
 
-enum DeviceType {
-    SLAVE, DRONE, UNKNOWN
-}
-
 /**
  * Created by datwelk on 19/06/14.
  */
@@ -88,5 +84,15 @@ public class DevicePacket implements Serializable {
                 ", longitude: " + mLongitude;
 
         return returnString;
+    }
+
+    public static DeviceType stringToDeviceType(String string) {
+        if (string.equalsIgnoreCase("slave")) {
+            return DeviceType.SLAVE;
+        } else if (string.equalsIgnoreCase("drone")) {
+            return DeviceType.DRONE;
+        } else {
+            return DeviceType.UNKNOWN;
+        }
     }
 }

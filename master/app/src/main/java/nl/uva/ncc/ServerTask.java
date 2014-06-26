@@ -15,10 +15,10 @@ import com.example.mymodule.app2.DevicePacket;
  * Created by datwelk on 23/06/14.
  */
 public class ServerTask extends AsyncTask<Void, DevicePacket, Void> {
-    private static SlaveLocationListener mSlaveLocationListener;
+    private static DevicePacketListener mDevicePacketListener;
 
-    public static void setmSlaveLocationListener(SlaveLocationListener slaveLocationListener) {
-        mSlaveLocationListener = slaveLocationListener;
+    public static void setDevicePacketListener(DevicePacketListener devicePacketListener) {
+        mDevicePacketListener = devicePacketListener;
     }
 
     public static DevicePacket deserialize(InputStream inputStream) {
@@ -38,7 +38,7 @@ public class ServerTask extends AsyncTask<Void, DevicePacket, Void> {
     @Override
     protected void onProgressUpdate(DevicePacket... devicePackets) {
         DevicePacket receivedDevicePacket = devicePackets[0];
-        mSlaveLocationListener.onLocationReceived(receivedDevicePacket);
+        mDevicePacketListener.onDevicePacketReceived(receivedDevicePacket);
     }
 
     @Override

@@ -23,14 +23,16 @@ import java.util.Collection;
 
 import se.bitcraze.crazyfliecontrol.R;
 import com.example.mymodule.app2.DevicePacket;
+import com.example.mymodule.app2.DeviceType;
 
-public class SlavesActivity extends Activity implements PeerListListener, SlaveLocationListener {
+public class SlavesActivity extends Activity implements PeerListListener, DevicePacketListener {
     boolean currentActivity;
     ListView mListView;
     Button mButton;
     Button mButtonVisualize;
     ArrayAdapter mAdapter;
-    ArrayList<DevicePacket> mDevicePackets;
+    ArrayList<DevicePacket> mSlaves;
+    DevicePacket mDrone;
 
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
@@ -55,8 +57,8 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         registerReceiver(mReceiver, mIntentFilter);
 
         // UI stuff
-        mDevicePackets = new ArrayList<DevicePacket>();
-        mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mDevicePackets);
+        mSlaves = new ArrayList<DevicePacket>();
+        mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setAdapter(mAdapter);
         mButton = (Button)findViewById(R.id.button_discover);
@@ -79,7 +81,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
             }
         });
 
-        ServerTask.setmSlaveLocationListener(this);
+        ServerTask.setDevicePacketListener(this);
     }
 
     public void visualize_devices() {
@@ -90,7 +92,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         ArrayList<String> mSlavesToString = new ArrayList<String>();
         ArrayList<String> mSlavesLatitude = new ArrayList<String>();
         ArrayList<String> mSlavesLongitude = new ArrayList<String>();
-        for(DevicePacket devicePacket : mDevicePackets) {
+        for(DevicePacket devicePacket : mSlaves) {
             if(devicePacket.getName() == null || devicePacket.getName().length() == 0) {
                 mSlavesToString.add(devicePacket.getIdentifier());
             } else {
@@ -129,17 +131,34 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
     }
 
     @Override
-    public void onLocationReceived(DevicePacket receivedDevicePacket) {
-        int index = mDevicePackets.indexOf(receivedDevicePacket);
+    public void onDevicePacketReceived(DevicePacket receivedDevicePacket) {
+        // Replace/update drone
+        if (mDrone != null && mDrone.equals(receivedDevicePacket)) {
+            mDrone = receivedDevicePacket;
 
+        // Too many drones
+        } else if (mDrone != null && receivedDevicePacket.getDeviceType() == DeviceType.DRONE) {
+            Log.e("", "Received packet from more then one drone.");
 
-        if (index == -1) {
-            Log.e("", "Received location from slave not known in mSlaves");
-            return;
-        } else {
-            mDevicePackets.set(index, receivedDevicePacket);
+        // Replace/update slave
+        } else if (receivedDevicePacket.getDeviceType() == DeviceType.SLAVE) {
+            int index = mSlaves.indexOf(receivedDevicePacket);
+
+            if (index == -1) {
+                Log.e("", "Received location from slave not known in mSlaves");
+                return;
+            } else {
+                mSlaves.set(index, receivedDevicePacket);
+                mAdapter.notifyDataSetChanged();
+            }
+
+        // Filter drone from mSlaves
+        } else if (receivedDevicePacket.getDeviceType() == DeviceType.DRONE) {
+            mSlaves.remove(receivedDevicePacket);
             mAdapter.notifyDataSetChanged();
+            mDrone = receivedDevicePacket;
         }
+
         visualize_devices();
     }
 
@@ -149,7 +168,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         Log.d("", "Peers available called. Found peers: " + deviceList.size());
 
         // Remove slaves from mSlaves that aren't connected anymore
-        for (DevicePacket devicePacket : mDevicePackets) {
+        for (DevicePacket devicePacket : mSlaves) {
             boolean isConnected = false;
             for (WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
                 if (devicePacket.getIdentifier().equals(DevicePacket.getTrimmedMAC(device.deviceAddress))) {
@@ -159,7 +178,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
             }
 
             if (!isConnected) {
-                mDevicePackets.remove(devicePacket);
+                mSlaves.remove(devicePacket);
                 mAdapter.notifyDataSetChanged();
             }
         }
@@ -170,7 +189,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
             // to be the group owner. 0 means least inclination.
             boolean alreadyConnected = false;
 
-            for (DevicePacket devicePacket : mDevicePackets) {
+            for (DevicePacket devicePacket : mSlaves) {
                 if (devicePacket.getIdentifier().equals(DevicePacket.getTrimmedMAC(device.deviceAddress))) {
                     Log.d("", "Already connected to device.");
                     alreadyConnected = true;
@@ -194,7 +213,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
 
                     DevicePacket devicePacket = new DevicePacket();
                     devicePacket.setIdentifier(device.deviceAddress);
-                    mDevicePackets.add(devicePacket);
+                    mSlaves.add(devicePacket);
                     mAdapter.notifyDataSetChanged();
                 }
 
@@ -205,8 +224,9 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
                 }
             });
         }
-        if (mDevicePackets.size() == 0) {
-            mButtonVisualize.setEnabled(true);
+
+        if (mSlaves.size() == 0) {
+            mButtonVisualize.setEnabled(false);
         } else {
             mButtonVisualize.setEnabled(true);
         }
