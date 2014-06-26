@@ -12,12 +12,15 @@ import android.net.wifi.p2p.WifiP2pManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.mymodule.app2.DevicePacket;
+import com.example.mymodule.app2.DeviceType;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesClient.OnConnectionFailedListener;
 import com.google.android.gms.common.GooglePlayServicesClient.ConnectionCallbacks;
@@ -50,7 +53,7 @@ public class MainActivity extends Activity implements
     private TextView mTvLatitude;
     private TextView mTvLongitude;
     private EditText mNameInput;
-
+    private Spinner mDeviceTypeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,13 +83,23 @@ public class MainActivity extends Activity implements
         mTvLongitude = (TextView) findViewById(R.id.tvLongitude);
         Button mButton = (Button) findViewById(R.id.button_discover);
         mNameInput = (EditText) findViewById(R.id.input_name);
+        mDeviceTypeSpinner = (Spinner) findViewById(R.id.device_type_spinner);
 
         mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 mReceiver.startDiscovery();
+                mDeviceTypeSpinner.setEnabled(false);
             }
         });
+
+        // Create an ArrayAdapter using the string array and a default spinner layout
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.device_types, android.R.layout.simple_spinner_item);
+        // Specify the layout to use when the list of choices appears
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        // Apply the adapter to the spinner
+        mDeviceTypeSpinner.setAdapter(adapter);
     }
 
     /* start location requests */
@@ -222,12 +235,18 @@ public class MainActivity extends Activity implements
             name = mNameInput.getText().toString();
         }
 
+        // Get device type
+        String deviceTypeStr = (String) mDeviceTypeSpinner.getSelectedItem();
+        DeviceType deviceType = DevicePacket.stringToDeviceType(deviceTypeStr);
+
         // Create slave object to send to master
         DevicePacket devicePacket = new DevicePacket();
         devicePacket.setIdentifier(address);
         devicePacket.setName(name);
         devicePacket.setLatitude(location.getLatitude());
         devicePacket.setLongitude(location.getLongitude());
+        devicePacket.setDeviceType(deviceType);
+        //TODO: setbearing
 
         // Send location to server
         new ClientTask().execute(devicePacket);

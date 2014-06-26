@@ -9,5 +9,8 @@
     <string name="longitude">Lon:</string>
     <string name="disconnect">Disconnect</string>
     <string name="discover">Discover</string>
-
+    <string-array name="device_types">
+        <item>Slave</item>
+        <item>Drone</item>
+    </string-array>
 </resources>
