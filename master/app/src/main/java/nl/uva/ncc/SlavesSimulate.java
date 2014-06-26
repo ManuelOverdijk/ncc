@@ -45,15 +45,15 @@ public class SlavesSimulate extends Activity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
-        setContentView(R.layout.activity_slaves_simulate);
+        //setContentView(R.layout.activity_slaves_simulate);
 
         mNames = new ArrayList<String>();
         mSlavesLat = new ArrayList<Double>();
         mSlavesLon = new ArrayList<Double>();
 
         processIntentData();
-//        arrow = new Arrow(this);
-//        setContentView(arrow);
+        arrow = new Arrow(this, mNames, mSlavesLat, mSlavesLon);
+        setContentView(arrow);
 //
 //        arrow.setOnClickListener(new ImageView.OnClickListener() {
 //            @Override
@@ -63,6 +63,7 @@ public class SlavesSimulate extends Activity {
 //        });
     }
 
+    @Override
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         //must store the new intent unless getIntent() will return the old one
@@ -87,7 +88,7 @@ public class SlavesSimulate extends Activity {
             mSlavesLon.add(Double.parseDouble(mSlavesLonStr.get(0)));
         }
 
-        visualize_devices();
+        //visualize_devices();
     }
 
     private void visualize_devices() {
@@ -115,7 +116,7 @@ public class SlavesSimulate extends Activity {
             lp.leftMargin = canvasWidth / 2;
             lp.topMargin = canvasHeight / 2;
 
-            Log.d("", "width: " + canvasWidth + " " + canvasWidth / 2);
+            Log.d("width", "width: " + canvasWidth + " " + canvasWidth / 2 + " height: " + canvasHeight);
 
             //add view to layout
             relativeLayout.addView(deviceTextview, lp);
