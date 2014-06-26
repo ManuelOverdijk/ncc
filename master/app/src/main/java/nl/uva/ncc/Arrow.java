@@ -22,6 +22,7 @@ import android.widget.LinearLayout;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import se.bitcraze.crazyfliecontrol.R;
 
@@ -48,9 +49,18 @@ public class Arrow extends ImageView implements View.OnTouchListener
     private int height = 0;
     private int width = 0;
 
-    public Arrow(Context context)
+    ArrayList<String> mNames;
+    ArrayList<Double> mSlavesLat;
+    ArrayList<Double> mSlavesLon;
+
+    public Arrow(Context context, ArrayList<String> slaveNames, ArrayList<Double> slavesLat,
+                 ArrayList<Double> slavesLon)
     {
         super(context);
+
+        mNames = slaveNames;
+        mSlavesLat = slavesLat;
+        mSlavesLon = slavesLon;
 
         paint = new Paint();
         paint.setColor(Color.BLACK);
@@ -58,8 +68,8 @@ public class Arrow extends ImageView implements View.OnTouchListener
         paint.setStyle(Style.STROKE);
         paint.setPathEffect(new DashPathEffect(new float[] { 10, 20 }, 0));
 
-//        bmpArrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow2);
-//        bmpDevice = BitmapFactory.decodeResource(context.getResources(), R.drawable.android2);
+        bmpArrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow2);
+        bmpDevice = BitmapFactory.decodeResource(context.getResources(), R.drawable.android2);
         bmpDeviceResized = Bitmap.createScaledBitmap(bmpDevice, 50, 50, false);
 
 
@@ -73,15 +83,23 @@ public class Arrow extends ImageView implements View.OnTouchListener
 
         if(oDevices.isEmpty())
         {
-            //cX = (width - bmpArrowResized.getWidth()) / 2;
-            //cY = (height - bmpArrowResized.getHeight()) / 2;
+            Random r = new Random();
+            int numberOfDevices = r.nextInt(3) + 3;
 
-            oDevices.add(new oDevice(50,50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
-            oDevices.add(new oDevice(50, height - 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
-            oDevices.add(new oDevice(width - 50, height - 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
-            oDevices.add(new oDevice(width - 50, 50, bmpDeviceResized, canvas.getWidth(), canvas.getHeight()));
+
+
+            for(int i = 0; i < numberOfDevices; i++) {
+//                oDevices.add(new oDevice(mSlavesLon.get(i), mSlavesLat.get(i), bmpDeviceResized,
+//                        canvas.getWidth(), canvas.getHeight()));
+                  oDevices.add(new oDevice(r.nextDouble()*width, r.nextDouble()*height, bmpDeviceResized, width, height));
+            }
         }
-        drawDevicesOnCanvas(oDevices, canvas);
+
+        try {
+            drawDevicesOnCanvas(oDevices, canvas);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         bmpArrowResized = Bitmap.createScaledBitmap(bmpArrow, this.thrust, this.thrust, false);
 
@@ -133,8 +151,10 @@ public class Arrow extends ImageView implements View.OnTouchListener
 
         for (oDevice i : devicesList) {
             canvas.drawCircle((int) i.getX(), (int) i.getY(), (int) i.getWidth(), fillPaint);
-            // Log.d("test", i.getX() + " " + i.getY());
+            Log.d("test", i.getX() + " " + i.getY());
             canvas.drawBitmap(bmpDeviceResized, (int) i.getX() - (int) i.getWidth() / 2, (int) i.getY() - (int) i.getHeight() / 2, null);
+            //String posText = i.getX() + ", " + i.getY();
+            //canvas.drawText(posText, 0, posText.length() - 1, (float)i.getX(), (float)(i.getY() + i.getHeight()), null);
         }
 
     }
