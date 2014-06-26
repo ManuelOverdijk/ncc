@@ -17,7 +17,7 @@ import com.example.mymodule.app2.DevicePacket;
  * Sends GPS location to server in an asynchronous task. Should be called every time the
  * location changes. groupOwnerAddress should be set first.
  */
-public class ClientTask extends AsyncTask<DevicePacket, Void, Void> implements Serializable {
+public class DroneAsyncTask extends AsyncTask<DevicePacket, Void, Void> implements Serializable {
     private static InetAddress groupOwnerAddress;
 
     public static void setGroupOwnerAddress(InetAddress address) {

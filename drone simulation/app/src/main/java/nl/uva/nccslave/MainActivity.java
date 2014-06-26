@@ -230,6 +230,6 @@ public class MainActivity extends Activity implements
         devicePacket.setLongitude(location.getLongitude());
 
         // Send location to server
-        new ClientTask().execute(devicePacket);
+        new DroneAsyncTask().execute(devicePacket);
     }
 }

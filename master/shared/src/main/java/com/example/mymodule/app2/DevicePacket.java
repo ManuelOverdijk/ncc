@@ -2,23 +2,29 @@ package com.example.mymodule.app2;
 
 import java.io.Serializable;
 
-import sun.rmi.runtime.Log;
+enum DeviceType {
+    SLAVE, DRONE, UNKNOWN
+}
 
 /**
  * Created by datwelk on 19/06/14.
  */
-public class Slave implements Serializable {
+public class DevicePacket implements Serializable {
     static final long serialVersionUID = 1337;
     private String mIdentifier;
     private String mName;
+    private DeviceType mDeviceType;
     private double mLatitude;
     private double mLongitude;
+    private double bearing;
 
-    public Slave() {
+    public DevicePacket() {
         this.mIdentifier = "Device ID";
         this.mName = null;
+        this.mDeviceType = DeviceType.UNKNOWN;
         this.mLatitude = Double.NaN;
         this.mLongitude = Double.NaN;
+        this.bearing = Double.NaN;
     }
 
     public void setIdentifier(String identifier) {
@@ -36,6 +42,10 @@ public class Slave implements Serializable {
     public String getName() {
         return this.mName;
     }
+
+    public void setDeviceType(DeviceType mDeviceType) { this.mDeviceType = mDeviceType; }
+
+    public DeviceType getDeviceType() { return this.mDeviceType; }
 
     public double getLatitude() {
         return this.mLatitude;
@@ -57,10 +67,18 @@ public class Slave implements Serializable {
         return mac.substring(3);
     }
 
+    public double getBearing() {
+        return this.bearing;
+    }
+
+    public void setBearing(double bearing) {
+        this.bearing = bearing;
+    }
+
     @Override
     public boolean equals(Object o) {
-        return (o instanceof Slave &&
-                ((Slave) o).getIdentifier().equals(this.getIdentifier()));
+        return (o instanceof DevicePacket &&
+                ((DevicePacket) o).getIdentifier().equals(this.getIdentifier()));
     }
 
     @Override

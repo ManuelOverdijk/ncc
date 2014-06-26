@@ -21,7 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import se.bitcraze.crazyfliecontrol.R;
-import com.example.mymodule.app2.Slave;
+import com.example.mymodule.app2.DevicePacket;
 
 public class SlavesActivity extends Activity implements PeerListListener, SlaveLocationListener {
     boolean currentActivity;
@@ -29,7 +29,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
     Button mButton;
     Button mButtonVisualize;
     ArrayAdapter mAdapter;
-    ArrayList<Slave> mSlaves;
+    ArrayList<DevicePacket> mDevicePackets;
 
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
@@ -52,8 +52,8 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         registerReceiver(mReceiver, mIntentFilter);
 
         // UI stuff
-        mSlaves = new ArrayList<Slave>();
-        mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mSlaves);
+        mDevicePackets = new ArrayList<DevicePacket>();
+        mAdapter = new SlaveAdapter(this, R.layout.view_slave_item, mDevicePackets);
         mListView = (ListView)findViewById(R.id.listView);
         mListView.setAdapter(mAdapter);
         mButton = (Button)findViewById(R.id.button_discover);
@@ -87,14 +87,14 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         ArrayList<String> mSlavesToString = new ArrayList<String>();
         ArrayList<String> mSlavesLatitude = new ArrayList<String>();
         ArrayList<String> mSlavesLongitude = new ArrayList<String>();
-        for(Slave slave : mSlaves) {
-            if(slave.getName() == null || slave.getName().length() == 0) {
-                mSlavesToString.add(slave.getIdentifier());
+        for(DevicePacket devicePacket : mDevicePackets) {
+            if(devicePacket.getName() == null || devicePacket.getName().length() == 0) {
+                mSlavesToString.add(devicePacket.getIdentifier());
             } else {
-                mSlavesToString.add(slave.getName());
+                mSlavesToString.add(devicePacket.getName());
             }
-            mSlavesLatitude.add(Double.toString(slave.getLatitude()));
-            mSlavesLongitude.add(Double.toString(slave.getLongitude()));
+            mSlavesLatitude.add(Double.toString(devicePacket.getLatitude()));
+            mSlavesLongitude.add(Double.toString(devicePacket.getLongitude()));
         }
 
         Intent intent = new Intent(getApplicationContext(), SlavesSimulate.class);
@@ -126,15 +126,15 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
     }
 
     @Override
-    public void onLocationReceived(Slave receivedSlave) {
-        int index = mSlaves.indexOf(receivedSlave);
+    public void onLocationReceived(DevicePacket receivedDevicePacket) {
+        int index = mDevicePackets.indexOf(receivedDevicePacket);
 
 
         if (index == -1) {
             Log.e("", "Received location from slave not known in mSlaves");
             return;
         } else {
-            mSlaves.set(index, receivedSlave);
+            mDevicePackets.set(index, receivedDevicePacket);
             mAdapter.notifyDataSetChanged();
         }
         visualize_devices();
@@ -146,17 +146,17 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
         Log.d("", "Peers available called. Found peers: " + deviceList.size());
 
         // Remove slaves from mSlaves that aren't connected anymore
-        for (Slave slave : mSlaves) {
+        for (DevicePacket devicePacket : mDevicePackets) {
             boolean isConnected = false;
             for (WifiP2pDevice device : wifiP2pDeviceList.getDeviceList()) {
-                if (slave.getIdentifier().equals(Slave.getTrimmedMAC(device.deviceAddress))) {
+                if (devicePacket.getIdentifier().equals(DevicePacket.getTrimmedMAC(device.deviceAddress))) {
                     isConnected = true;
                     break;
                 }
             }
 
             if (!isConnected) {
-                mSlaves.remove(slave);
+                mDevicePackets.remove(devicePacket);
                 mAdapter.notifyDataSetChanged();
             }
         }
@@ -167,8 +167,8 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
             // to be the group owner. 0 means least inclination.
             boolean alreadyConnected = false;
 
-            for (Slave slave : mSlaves) {
-                if (slave.getIdentifier().equals(Slave.getTrimmedMAC(device.deviceAddress))) {
+            for (DevicePacket devicePacket : mDevicePackets) {
+                if (devicePacket.getIdentifier().equals(DevicePacket.getTrimmedMAC(device.deviceAddress))) {
                     Log.d("", "Already connected to device.");
                     alreadyConnected = true;
                 }
@@ -189,9 +189,9 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
                     // Request info about device
                     Log.d("", "Successfully connected to device");
 
-                    Slave slave = new Slave();
-                    slave.setIdentifier(device.deviceAddress);
-                    mSlaves.add(slave);
+                    DevicePacket devicePacket = new DevicePacket();
+                    devicePacket.setIdentifier(device.deviceAddress);
+                    mDevicePackets.add(devicePacket);
                     mAdapter.notifyDataSetChanged();
                 }
 
@@ -202,7 +202,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
                 }
             });
         }
-        if (mSlaves.size() == 0) {
+        if (mDevicePackets.size() == 0) {
             mButtonVisualize.setEnabled(false);
         } else {
             mButtonVisualize.setEnabled(true);

@@ -17,10 +17,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.example.mymodule.app2.Slave;
-
 import java.util.ArrayList;
-import java.util.Random;
 
 import se.bitcraze.crazyfliecontrol.R;
 

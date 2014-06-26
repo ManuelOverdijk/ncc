@@ -9,36 +9,36 @@ import java.net.ServerSocket;
 import java.net.Socket;
 
 import android.os.AsyncTask;
-import com.example.mymodule.app2.Slave;
+import com.example.mymodule.app2.DevicePacket;
 
 /**
  * Created by datwelk on 23/06/14.
  */
-public class ServerTask extends AsyncTask<Void, Slave, Void> {
+public class ServerTask extends AsyncTask<Void, DevicePacket, Void> {
     private static SlaveLocationListener mSlaveLocationListener;
 
     public static void setmSlaveLocationListener(SlaveLocationListener slaveLocationListener) {
         mSlaveLocationListener = slaveLocationListener;
     }
 
-    public static Slave deserialize(InputStream inputStream) {
-        Slave slave = null;
+    public static DevicePacket deserialize(InputStream inputStream) {
+        DevicePacket devicePacket = null;
         try {
             ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-            slave = (Slave)objectInputStream.readObject();
+            devicePacket = (DevicePacket)objectInputStream.readObject();
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
-        return slave;
+        return devicePacket;
     }
 
     @Override
-    protected void onProgressUpdate(Slave... slaves) {
-        Slave receivedSlave = slaves[0];
-        mSlaveLocationListener.onLocationReceived(receivedSlave);
+    protected void onProgressUpdate(DevicePacket... devicePackets) {
+        DevicePacket receivedDevicePacket = devicePackets[0];
+        mSlaveLocationListener.onLocationReceived(receivedDevicePacket);
     }
 
     @Override
@@ -58,10 +58,10 @@ public class ServerTask extends AsyncTask<Void, Slave, Void> {
                 Socket client = serverSocket.accept();
                 Log.d("", "after accept");
 
-                Slave receivedSlave = deserialize(client.getInputStream());
-                publishProgress(receivedSlave);
+                DevicePacket receivedDevicePacket = deserialize(client.getInputStream());
+                publishProgress(receivedDevicePacket);
 
-                Log.d("", "Received location from device: " + receivedSlave);
+                Log.d("", "Received location from device: " + receivedDevicePacket);
             } catch (IOException e) {
                 e.printStackTrace();
             }
