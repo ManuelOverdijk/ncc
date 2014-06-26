@@ -3,6 +3,7 @@ package nl.uva.ncc;
 /**
  * Created by koen on 24-6-14.
  */
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -13,6 +14,7 @@ import android.view.Display;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -49,8 +51,15 @@ public class SlavesSimulate extends Activity {
         mSlavesLon = new ArrayList<Double>();
 
         processIntentData();
+        RelativeLayout rl = new RelativeLayout(this);
+        Button btn = new Button(this);
+        btn.setId('1');
+        btn.setText("Test");
+
         arrow = new Arrow(this, mNames, mSlavesLat, mSlavesLon);
-        setContentView(arrow);
+        rl.addView(arrow);
+        rl.addView(btn);
+        setContentView(rl);
 //
 //        arrow.setOnClickListener(new ImageView.OnClickListener() {
 //            @Override

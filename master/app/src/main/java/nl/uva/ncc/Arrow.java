@@ -73,8 +73,8 @@ public class Arrow extends View
         paint.setStyle(Style.STROKE);
         paint.setPathEffect(new DashPathEffect(new float[] { 10, 20 }, 0));
 
-//        bmpArrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow2);
-//        bmpDevice = BitmapFactory.decodeResource(context.getResources(), R.drawable.android2);
+        bmpArrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.abc_ab_bottom_solid_dark_holo);
+        bmpDevice = BitmapFactory.decodeResource(context.getResources(), R.drawable.abc_ic_clear_disabled);
         bmpDeviceResized = Bitmap.createScaledBitmap(bmpDevice, 50, 50, false);
 
 //        Button btn = new Button(this);
