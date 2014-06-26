@@ -206,7 +206,7 @@ public class SlavesActivity extends Activity implements PeerListListener, SlaveL
             });
         }
         if (mDevicePackets.size() == 0) {
-            mButtonVisualize.setEnabled(false);
+            mButtonVisualize.setEnabled(true);
         } else {
             mButtonVisualize.setEnabled(true);
         }
