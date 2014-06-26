@@ -6,6 +6,10 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.IntentSender;
 import android.content.pm.ActivityInfo;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
@@ -33,7 +37,8 @@ import com.google.android.gms.location.LocationRequest;
 public class MainActivity extends Activity implements
         ConnectionCallbacks,
         OnConnectionFailedListener,
-        LocationListener {
+        LocationListener,
+        SensorEventListener {
 
     private static final int MILLISECONDS_PER_SECOND = 1000;
     private static final int UPDATE_INTERVAL_IN_SECONDS = 5;
@@ -42,8 +47,15 @@ public class MainActivity extends Activity implements
     private static final long FASTEST_INTERVAL = MILLISECONDS_PER_SECOND * FASTEST_INTERVAL_IN_SECONDS;
     private final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
 
+    // Location
     LocationRequest mLocationRequest;
     LocationClient mLocationClient;
+
+    // Bearing
+    private SensorManager sensorManager;
+    float[] mGravity = null;
+    float[] mGeomagnetic = null;
+    float mBearing = 0;
 
     WifiP2pManager mManager;
     WifiP2pManager.Channel mChannel;
@@ -102,6 +114,8 @@ public class MainActivity extends Activity implements
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         // Apply the adapter to the spinner
         mDeviceTypeSpinner.setAdapter(adapter);
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
     }
 
     /* start location requests */
@@ -111,18 +125,29 @@ public class MainActivity extends Activity implements
         mLocationClient.connect();
     }
 
-    /* unregister the broadcast receiver */
-    @Override
-    protected void onPause() {
-        super.onPause();
-        unregisterReceiver(mReceiver);
-    }
-
     /* register the broadcast receiver with the intent values to be matched */
     @Override
     protected void onResume() {
         super.onResume();
         registerReceiver(mReceiver, mIntentFilter);
+
+        // Register for sensors
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
+                sensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this,
+                sensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD),
+                sensorManager.SENSOR_DELAY_NORMAL);
+    }
+
+    /* unregister the broadcast receiver */
+    @Override
+    protected void onPause() {
+        super.onPause();
+        unregisterReceiver(mReceiver);
+
+        // Unregister for sensors
+        sensorManager.unregisterListener(this);
     }
 
     /*
@@ -248,9 +273,40 @@ public class MainActivity extends Activity implements
         devicePacket.setLatitude(location.getLatitude());
         devicePacket.setLongitude(location.getLongitude());
         devicePacket.setDeviceType(deviceType);
-        //TODO: setbearing
+        devicePacket.setBearing(mBearing);
 
         // Send location to server
         new ClientTask().execute(devicePacket);
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {}
+
+    // from http://stackoverflow.com/questions/15155985/android-compass-bearing
+    // Gets bearing in degrees. 0/360 = north
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        // Get gravity
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER)
+            mGravity = sensorEvent.values;
+
+        // Get magnetic field
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_MAGNETIC_FIELD)
+            mGeomagnetic = sensorEvent.values;
+
+        // Get bearing
+        if (mGravity != null && mGeomagnetic != null) {
+            float R[] = new float[9];
+            float I[] = new float[9];
+            boolean success = SensorManager.getRotationMatrix(R, I, mGravity,
+                    mGeomagnetic);
+            if (success) {
+                float orientation[] = new float[3];
+                SensorManager.getOrientation(R, orientation);
+                float azimuthInRadians = orientation[0];
+                float azimuthInDegrees = (float)(Math.toDegrees(azimuthInRadians)+360)%360;
+                mBearing = azimuthInDegrees;
+            }
+        }
     }
 }
