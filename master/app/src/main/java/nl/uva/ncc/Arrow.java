@@ -68,8 +68,8 @@ public class Arrow extends ImageView implements View.OnTouchListener
         paint.setStyle(Style.STROKE);
         paint.setPathEffect(new DashPathEffect(new float[] { 10, 20 }, 0));
 
-        bmpArrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow2);
-        bmpDevice = BitmapFactory.decodeResource(context.getResources(), R.drawable.android2);
+//        bmpArrow = BitmapFactory.decodeResource(context.getResources(), R.drawable.arrow2);
+//        bmpDevice = BitmapFactory.decodeResource(context.getResources(), R.drawable.android2);
         bmpDeviceResized = Bitmap.createScaledBitmap(bmpDevice, 50, 50, false);
 
 
